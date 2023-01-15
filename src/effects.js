@@ -276,7 +276,8 @@
 
       // ..and finally animate..
       if (this._shouldAnimate()) {  // only animate when playing, not when recording
-        if ('Raphael' in window && opts.arrow) { // draw arrows only if Raphael is loaded
+        // if ('Raphael' in window && opts.arrow) { // draw arrows only if Raphael is loaded
+        if ('d3' in window && opts.arrow){
           var off1 = $val1.offset(),
               off2 = $val2.offset(),
               coff = this.canvas.offset(),

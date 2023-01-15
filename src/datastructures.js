@@ -2,7 +2,8 @@
 * Module that contains the data structure implementations.
 * Depends on core.js, anim.js, utils.js, effects.js
 */
-/*global JSAV, jQuery, Raphael */
+/*global JSAV, jQuery, Raphael, d3 */
+
 (function($) {
   "use strict";
   if (typeof JSAV === "undefined") { return; }
@@ -35,10 +36,17 @@
   var dsproto = JSAVDataStructure.prototype;
   dsproto.getSvg = function() {
       if (!this.svg) { // lazily create the SVG overlay only when needed
-        this.svg = new Raphael(this.element[0]);
-        this.svg.renderfix();
-        var style = this.svg.canvas.style;
+        // this.svg = new Raphael(this.element[0]);
+        
+        d3.select(this.element[0]).append('svg').attr('class', 'my-svg');
+        this.svg = d3.selectAll('.my-svg').filter(':last-child').node();
+        
+        //this.svg.renderfix();
+        d3.select(this.svg).attr("shape-rendering", "crispEdges");
+        var style = this.svg.style;
         style.position = "absolute";
+        style.overflow = "hidden";
+        
       }
       return this.svg;
     };
@@ -68,6 +76,8 @@
     if (startPos.left === endPos.left && startPos.top === endPos.top) {
       // layout not done yet
       this.g = this.jsav.g.line(-1, -1, -1, -1, $.extend({container: this.container}, this.options));
+      
+      
     } else {
       if (end) {
         endPos.left += end.element.outerWidth() / 2;
@@ -80,14 +90,18 @@
                               startPos.top,
                               endPos.left,
                               endPos.top, $.extend({container: this.container}, this.options));
+      
     }
 
-    this.element = $(this.g.rObj.node);
+ 
+    // this.element = $(this.g.rObj.node);
+    this.element = $(d3.select(this.g.rObj).node());   
 
     var visible = (typeof this.options.display === "boolean" && this.options.display === true);
-    this.g.rObj.attr({"opacity": 0});
+    // this.g.rObj.attr({"opacity": 0});
+    d3.select(this.g.rObj).attr('opacity', 0);
     this.element.addClass("jsavedge");
-    if (start) {
+    if (start) {      
       this.element[0].setAttribute("data-startnode", this.startnode.id());
     }
     if (end) {
@@ -111,7 +125,8 @@
       return this.startnode;
     } else {
       this.startnode = node;
-      this.g.rObj.node.setAttribute("data-startnode", this.startnode?this.startnode.id():"");
+      // this.g.rObj.node.setAttribute("data-startnode", this.startnode?this.startnode.id():"");
+      this.g.rObj.setAttribute("data-endnode", this.endnode?this.endnode.id():"");
       return this;
     }
   };
@@ -120,7 +135,8 @@
       return this.endnode;
     } else {
       this.endnode = node;
-      this.g.rObj.node.setAttribute("data-endnode", this.endnode?this.endnode.id():"");
+      // this.g.rObj.node.setAttribute("data-endnode", this.endnode?this.endnode.id():"");
+      this.g.rObj.setAttribute("data-endnode", this.endnode?this.endnode.id():"");
       return this;
     }
   };
@@ -138,17 +154,24 @@
     }
   };
   edgeproto.clear = function() {
-    this.g.rObj.remove();
+    // this.g.rObj.remove();
+    d3.select(this.g.rObj).remove();
   };
   edgeproto.hide = function(options) {
     if (this.g.isVisible()) {
-      this.g.hide(options);
+      // this.g.hide(options);
+      console.log(options);
+      console.log(this.g);
+      d3.select(this.g.rObj).attr('visibility', 'hidden');
       if (this._label) { this._label.hide(options); }
     }
   };
   edgeproto.show = function(options) {
     if (!this.g.isVisible()) {
-      this.g.show(options);
+      // this.g.show(options);
+      console.log(options);
+      console.log(this.g);
+      d3.select(this.g.rObj).attr('visibility', 'visible');
       if (this._label) { this._label.show(options); }
     }
   };
@@ -216,28 +239,37 @@
     var oldProps = $.extend(true, {}, cssprop),
         el = this.g.rObj,
         newprops;
+    console.log(this.g.rObj);
+    console.log(d3.select(el).attr(cssprop));
     if (typeof cssprop === "string" && typeof value !== "undefined") {
-      oldProps[cssprop] = el.attr(cssprop);
+      // oldProps[cssprop] = el.attr(cssprop);
+      oldProps[cssprop] = d3.select(el).attr(cssprop);
       newprops = {};
       newprops[cssprop] = value;
     } else {
       for (var i in cssprop) {
         if (cssprop.hasOwnProperty(i)) {
-          oldProps[i] = el.attr(i);
+          // oldProps[i] = el.attr(i);
+          oldProps[i] = d3.select(el).attr(i);
         }
       }
       newprops = cssprop;
     }
     if (this.jsav._shouldAnimate()) { // only animate when playing, not when recording
-      el.animate(newprops, this.jsav.SPEED);
+      // el.animate(newprops, this.jsav.SPEED);
+
+      d3.select(el).transition().duration(this.jsav.SPEED).style(newprops);
     } else {
-      el.attr(newprops);
+      // el.attr(newprops);
+      d3.select(el).attr(newprops);
     }
     return [oldProps];
   });
   edgeproto.css = function(cssprop, value, options) {
     if (typeof cssprop === "string" && typeof value === "undefined") {
-      return this.g.rObj.attr(cssprop);
+      // return this.g.rObj.attr(cssprop);
+      console.log(d3.select(this.g.rObj).attr(cssprop));
+      return d3.select(this.g.rObj).attr(cssprop);
     } else {
       return this._setcss(cssprop, value, options);
     }
@@ -267,7 +299,7 @@
     }
   };
   edgeproto.position = function() {
-    var bbox = this.g.bounds();
+    var bbox = d3.select(this.g).bounds();
     return {left: bbox.left, top: bbox.top};
   };
   // add class handling functions
@@ -330,9 +362,11 @@
         endStrokeAdjust = this.options["arrow-end"]?strokeWidth * ADJUSTMENT_MAGIC:0,
         toPoint = getNodeBorderAtAngle({width: eWidth + endStrokeAdjust, height: eHeight + endStrokeAdjust, x: toX, y: toY},
                                         {x: fromX, y: fromY}, toAngle, endRadius);
+        console.log(this.g.element.css("stroke-width"));
     // getNodeBorderAtAngle returns an array [x, y], and movePoints wants the point position
     // in the (poly)line as first item in the array, so we'll create arrays like [0, x, y] and
     // [1, x, y]
+
     this.g.movePoints([[0].concat(fromPoint), [1].concat(toPoint)], options);
 
     if ($.isFunction(this._labelPositionUpdate)) {

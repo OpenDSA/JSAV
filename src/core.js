@@ -1,7 +1,9 @@
 /**
 * Module that contains JSAV core.
 */
-/*global JSAV, jQuery, Raphael */
+/*global JSAV, jQuery, Raphael, d3 */
+
+
 (function($) {
   "use strict";
   var JSAV = function() {
@@ -18,18 +20,25 @@
   var jsavproto = JSAV.prototype;
   jsavproto.getSvg = function() {
     if (!this.svg) { // lazily create the SVG overlay only when needed
-      this.svg = Raphael(this.canvas[0]);
+      //this.svg = Raphael(this.canvas[0]);
+      d3.select(this.canvas[0]).append('svg').attr('class', 'my-svg');
+      this.svg = d3.selectAll('.my-svg').filter(':last-child').node();
 //      this.svg.renderfix();
+      
+      this.svg.attr("shape-rendering", "crispEdges");
       var style = this.svg.canvas.style;
       style.position = "absolute";
+      // this.svg.canvas.style("position", "absolute");
     }
     return this.svg;
   };
   jsavproto.id = function() {
     var id = this.container[0].id;
+    // var id = this.container.attr("id");
     if (!id) {
       id = JSAV.utils.createUUID();
       this.container[0].id = id;
+      // this.container.attr("id", id);
     }
     return id;
   };
@@ -49,8 +58,10 @@
     // this will point to a newly-created JSAV instance
     if (typeof arguments[0] === "string") {
       this.container = $(document.getElementById(arguments[0]));
+      // this.container = d3.select(document.getElementById(arguments[0]));
     } else if (arguments[0] instanceof HTMLElement) {
       this.container = $(arguments[0]); // make sure it is jQuery object
+      // this.container = d3.select(arguments[0]);
     } else if (arguments[0] && typeof arguments[0] === "object" && arguments[0].constructor === jQuery) {
       this.container = arguments[0];
     }
@@ -66,6 +77,7 @@
       this.options = $.extend(defaultOptions, arguments[0]);
       // set the element option as the container
       this.container = $(this.options.element);
+      // this.container = d3.select(this.options.element);
     }
 
     // initialHTML will be logged as jsav-init, this._initialHTML used in clear
@@ -76,9 +88,11 @@
     this.canvas = this.container.find(".jsavcanvas");
     if (this.canvas.size() === 0) {
       this.canvas = $("<div />").addClass("jsavcanvas").appendTo(this.container);
+      // this.canvas = d3.create("div").classed("jsavcanvas", true).append("div");
     }
     // element used to block events when animating
     var shutter = $("<div class='jsavshutter' />").appendTo(this.container);
+    // var shutter = d3.create("div").classed("jsavshutter", true).append("div");
     this._shutter = shutter;
 
     this.RECORD = true;
@@ -143,6 +157,8 @@
         if (that.svg) { // handling of SVG
           var curr = that.svg.bottom, // start from the element in the behind
               bbox, strokeWidth;
+          // var curr = d3.select(that.svg[last])
+          //     bbox, strokeWidth;
           while (curr) { // iterate all SVG objects in Raphael
             bbox = curr.getBBox();
             strokeWidth = curr.attr("stroke-width");

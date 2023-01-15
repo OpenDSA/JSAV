@@ -1,9 +1,13 @@
 /**
 * Module that contains the graphical primitive implementations.
-* Depends on core.js, anim.js, jQuery, Raphael
+* Depends on core.js, anim.js, jQuery, Raphael, d3
 */
-/*global JSAV, jQuery, Raphael */
-if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
+/*global JSAV, jQuery, Raphael, d3 */
+
+
+
+// if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
+if (typeof d3 !== "undefined"){
   (function($, R) {
     "use strict";
     if (typeof JSAV === "undefined") { return; }
@@ -27,20 +31,28 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         return (this.css("opacity") !== 0);
       },
       transform: function(transform, options) {
-        var oldTrans = this.rObj.transform();
+        // var oldTrans = this.rObj.transform();
+        var oldTrans = this.rObj.attr("transform")
         if (this.jsav._shouldAnimate()) { // only animate when playing, not when recording
-          this.rObj.animate( { transform: transform }, this.jsav.SPEED);
+          // this.rObj.animate( { transform: transform }, this.jsav.SPEED);
+          console.log(this.rObj);
+          d3.select(this.rObj).transition()
+            .attr("transform", transform)
+            .duration(this.jsav.SPEED);
         } else {
-          this.rObj.transform(transform, options);
+          // this.rObj.transform(transform, options);
+          d3.select(this.rObj).attr('transform', options);
         }
         return oldTrans;
       },
       rotate: JSAV.anim(function(deg) {
         this.transform("...r" + deg);
+        // this.transition().attr("rotate", "...r" + deg);
         return [0 - deg];
       }),
       scale: JSAV.anim(function(sx, sy) {
         this.transform("...S" + sx + "," + sy);
+        // this.transition().attr("scale", "...S" + sx + "," + sy);
         return [1.0/sx, 1.0/sy];
       }),
       scaleX: function(sx, options) {
@@ -51,6 +63,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       },
       translate: JSAV.anim(function(dx, dy, options) {
         this.transform("...T" + dx + "," + dy);
+        // this.transition().attr("translate", "...T" + dx + "," + dy);
         return [0-dx, 0-dy];
       }),
       translateX: function(dx, options) {
@@ -63,15 +76,21 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         var oldProps = $.extend(true, {}, props);
         for (var i in props) {
           if (props.hasOwnProperty(i)) {
-            oldProps[i] = this.rObj.attr(i);
+            // oldProps[i] = this.rObj.attr(i);
+            oldProps[i] = d3.select(this.rObj).attr(i);
           }
         }
         if (this.jsav._shouldAnimate() && (!options || !options.dontAnimate)) { // only animate when playing, not when recording
-          this.rObj.animate( props, this.jsav.SPEED);
+          // this.rObj.animate( props, this.jsav.SPEED);
+          
+          d3.select(this.rObj).transition()
+            .duration(this.jsav.SPEED)
+            .attr(props);
         } else {
           for (i in props) {
             if (props.hasOwnProperty(i)) {
-              this.rObj.attr(i, props[i]);
+              // this.rObj.attr(i, props[i]);
+              d3.select(this.rObj).attr(i, props[i]);
             }
           }
         }
@@ -79,7 +98,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       }),
       css: function(props, options) {
         if (typeof props === "string") {
-          return this.rObj.attr(props);
+          // return this.rObj.attr(props);
+          return d3.select(this.rObj).attr(props);
         } else {
           return this._setattrs(props, options);
         }
@@ -88,7 +108,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         if (typeof newState !== "undefined") {
           for (var i in newState) {
             if (newState.hasOwnProperty(i)) {
-              this.rObj.attr(i, newState[i]);
+              // this.rObj.attr(i, newState[i]);
+              d3.select(this.rObj).attr(i, newState[i]);
             }
           }
           return this;
@@ -98,12 +119,14 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         }
       },
       bounds: function() {
-        var bbox = this.rObj.getBBox();
+        // var bbox = this.rObj.getBBox();
+        var bbox = this.rObj.bounds();
         return { left: bbox.x, top: bbox.y, width: bbox.width, height: bbox.height };
       },
       id: JSAV._types.JSAVObject.prototype.id,
       clear: function() {
-        this.rObj.remove();
+        // this.rObj.remove();
+        d3.select(this.rObj).remove();
       }
     };
     var graphicalproto = JSAVGraphical.prototype;
@@ -151,17 +174,23 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
 
     var init = function(obj, jsav, props) {
       obj.jsav = jsav;
-      obj.element = $(obj.rObj.node).data("svgelem", obj.rObj);
+      // obj.element = $(obj.rObj.node).data("svgelem", obj.rObj);
+
+      obj.element = $(d3.select(obj.rObj).node()).data('svgelem', obj.rObj);
+      
       var prop = $.extend({'visible': true}, props);
       for (var i in prop) {
         if (prop.hasOwnProperty(i)) {
-          obj.rObj.attr(i, prop[i]);
+          // obj.rObj.attr(i, prop[i]);
+          d3.select(obj.rObj).attr(i, props[i]);
         }
       }
       // if opacity not set manually, we'll hide the object and show it if it
       // should be visible
       if (!('opacity' in prop)) {
-        obj.rObj.attr('opacity', 0);
+        // obj.rObj.attr('opacity', 0);
+        d3.select(obj.rObj).attr('opacity', 0);
+
         var visible = (typeof prop.visible === "boolean" &&
                       prop.visible === true);
         if (visible) {
@@ -175,7 +204,13 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     // point of a line. Parameters dx and dy tell how much the point should be
     // translated.
     var translatePoint  = function(point, dx, dy, options) {
-      var currPath = this.rObj.attrs.path,
+      // var currPath = this.rObj.attrs.path,
+      // var currPath = d3.select(this.rObj).attr('path');
+      var currPath = d3.select(this.rObj)
+        .attr('path')
+        .split(",").map(function(substring) {
+          return substring.trim().split(" ");
+        }),
           newPath = "",
           pathElem;
       if (point > currPath.length) { return this; }
@@ -188,7 +223,19 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
           newPath += pathElem.join(' ');
         }
       }
-      this._setattrs({"path": newPath}, options);
+      var path_string = "";
+      var mid = newPath.length / 2;
+      for (i = 0; i < mid; i++) {
+        pathElem = newPath[i];
+        path_string += pathElem.join(' ');
+      }
+      path_string += ',';
+      for (i = mid; i < newPath.length; i++) {
+        pathElem = newPath[i];
+        path_string += pathElem.join(' ');
+      }
+      console.log(newPath);
+      this._setattrs({"d": newPath, "path": path_string}, options);
       return this;
     };
 
@@ -197,23 +244,50 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     // For example, to change points 0 and 3 in a polyline points should be:
     //  [[0, new0X, new0Y], [3, new3X, new3Y]]
     var movePoints  = function(points, options) {
-      var currPath = this.rObj.attrs.path,
-          newPath = currPath.slice(),
+      
+      // var currPath = this.rObj.attrs.path,
+      
+      
+      var currPath = d3.select(this.rObj)
+        .attr('path')
+        .split(",").map(function(substring) {
+          return substring.trim().split(" ");
+        }),
+          newPath = currPath.slice(),       
           newPoints = this.points(),
           pathElem, i, l;
+
+      
       for (i = 0, l = points.length; i < l; i++) {
         var p = points[i];
         pathElem = currPath[p[0]];
         newPath[p[0]] = [pathElem[0], p[1], p[2]];
         newPoints[p[0]] = p.slice(1);
+        
       }
+      
+
+      
       var np = "";
       for (i = 0, l = newPath.length; i < l; i++) {
         pathElem = newPath[i];
         np += pathElem.join(' ');
       }
+
+      var path_string = "";
+      var mid = newPath.length / 2;
+      for (i = 0; i < mid; i++) {
+        pathElem = newPath[i];
+        path_string += pathElem.join(' ');
+      }
+      path_string += ',';
+      for (i = mid; i < newPath.length; i++) {
+        pathElem = newPath[i];
+        path_string += pathElem.join(' ');
+      }
+
       this._setpoints(newPoints);
-      this._setattrs({"path": np}, $.extend({dontAnimate: ("" + currPath) === "M-1,-1L-1,-1"}, options));
+      this._setattrs({"d": np, "path": path_string}, $.extend({dontAnimate: ("" + currPath) === "M-1,-1L-1,-1"}, options));
       return this;
     };
     var _setpoints = JSAV.anim(function (newPoints) {
@@ -226,8 +300,16 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       return $.extend(true, [], this._points); // deep copy of points
     };
 
-    var Circle = function(jsav, raphael, x, y, r, props) {
-      this.rObj = raphael.circle(x, y, r);
+    // var Circle = function(jsav, raphael, x, y, r, props) {
+    var Circle = function(jsav, canvas, x, y, r, props) {
+      // this.rObj = raphael.circle(x, y, r);
+      d3.select(canvas).append('circle')
+        .attr('class', 'circle-obj')
+        .attr('x', x)
+        .attr('y', y)
+        .attr('r', r);
+
+      this.rObj = d3.selectAll('.circle-obj').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -235,7 +317,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     var cproto = Circle.prototype;
     cproto.center = function(x, y, options) {
       if (typeof x === "undefined") { // getting center
-        return this.rObj.attr(["cx", "cy"]);
+        // return this.rObj.attr(["cx", "cy"]);
+        return d3.select(this.rObj).attr(['cx', 'cy']);
       } else if ($.isArray(x) && x.length === 2) {
         this._setattrs({"cx": x[0], "cy": x[1]}, options);
       } else if (typeof y !== "undefined") {
@@ -247,15 +330,27 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     };
     cproto.radius = function(r, options) {
       if (typeof r === "undefined") {
-        return this.rObj.attr("r");
+        // return this.rObj.attr("r");
+        return d3.select(this.rObj).attr('r');
       } else {
         this._setattrs({"r": r}, options);
         return this;
       }
     };
 
-    var Rect = function(jsav, raphael, x, y, w, h, r, props) {
-      this.rObj = raphael.rect(x, y, w, h, r);
+    // var Rect = function(jsav, raphael, x, y, w, h, r, props) {
+    var Rect = function(jsav, canvas, x, y, w, h, r, props) {
+      // this.rObj = raphael.rect(x, y, w, h, r);
+      
+      d3.select(canvas).append('rect')
+        .attr('class', 'rect-obj')
+        .attr('x', x)
+        .attr('y', y)
+        .attr("width", w)
+        .attr("height", h)
+        .attr("rx", r);
+
+      this.rObj = d3.selectAll('.rect-obj').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -263,7 +358,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     var rectproto = Rect.prototype;
     rectproto.width = function(w, options) {
       if (typeof w === "undefined") {
-        return this.rObj.attr("width");
+        // return this.rObj.attr("width");
+        return d3.select(this.rObj).attr('width');
       } else {
         this._setattrs({"width": w}, options);
         return this;
@@ -271,15 +367,30 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     };
     rectproto.height = function(h, options) {
       if (typeof h === "undefined") {
-        return this.rObj.attr("height");
+        // return this.rObj.attr("height");
+        return d3.select(this.rObj).attr('height');
       } else {
         this._setattrs({"height": h}, options);
         return this;
       }
     };
 
-    var Line = function(jsav, raphael, x1, y1, x2, y2, props) {
-      this.rObj = raphael.path("M" + x1 + " "+ y1 + "L" + x2 + " " + y2);
+    // var Line = function(jsav, raphael, x1, y1, x2, y2, props) {
+    var Line = function Line(jsav, canvas, x1, y1, x2, y2, props) {
+      // this.rObj = raphael.path("M" + x1 + " "+ y1 + "L" + x2 + " " + y2);
+      var path = "M" + x1 + " " + y1 + "L" + x2 + " " + y2;
+      var path_string = "M" + " " + x1 + " " + y1 + "," + "L" + " " + x2 + " " + y2;
+      
+
+      d3.select(canvas).append('path')
+        .attr('class', 'line-obj')
+        .attr('d', path)
+        .attr('fill', 'none')
+        .attr('stroke', '#000000')
+        .attr('path', path_string);
+
+      this.rObj = d3.selectAll('.line-obj').filter(":last-child").node();
+      
       init(this, jsav, props);
       this._points = [[x1, y1], [x2, y2]];
       return this;
@@ -300,8 +411,19 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     Line.prototype.points = points;
     Line.prototype._setpoints = _setpoints;
 
-    var Ellipse = function(jsav, raphael, x, y, rx, ry, props) {
-      this.rObj = raphael.ellipse(x, y, rx, ry);
+    // var Ellipse = function(jsav, raphael, x, y, rx, ry, props) {
+    var Ellipse = function Ellipse(jsav, canvas, x, y, rx, ry, props) {
+      // this.rObj = raphael.ellipse(x, y, rx, ry);
+      
+      
+      d3.select(canvas).append('ellipse')
+        .attr('class', 'ellipse-obj')
+        .attr('x', x)
+        .attr('y', y)
+        .attr("rx", rx)
+        .attr("ry", ry);
+
+      this.rObj = d3.selectAll('.ellipse-obj').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -310,7 +432,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     ellproto.center = cproto.center;
     ellproto.radius = function(x, y, options) {
       if (typeof x === "undefined") { // getting radius
-        return this.rObj.attr(["rx", "ry"]);
+        // return this.rObj.attr(["rx", "ry"]);
+        return d3.select(this.rObj).attr(['rx','ry']);
       } else if ($.isArray(x) && x.length === 2) {
         this._setattrs({"rx": x[0], "ry": x[1]}, options);
       } else if (typeof y !== "undefined") {
@@ -322,7 +445,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     };
 
 
-    var Polyline = function(jsav, raphael, points, close, props) {
+    // var Polyline = function(jsav, raphael, points, close, props) {
+    var Polyline = function Polyline(jsav, canvas, points, close, props) {
       var path = "M ";
       for (var i=0, l=points.length; i < l; i++) {
         if (i) { path += "L";}
@@ -331,7 +455,16 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       if (close) {
         path += "Z";
       }
-      this.rObj = raphael.path(path);
+      // this.rObj = raphael.path(path);
+
+      d3.select(canvas).append('path')
+        .attr('class', 'polyline-obj')
+        .attr('d', path)
+        .attr('fill', 'none')
+        .attr('stroke', '#000000');
+
+      this.rObj = d3.selectAll('.polyline-obj').filter(":last-child").node();
+      
       init(this, jsav, props);
       this._points = points;
       return this;
@@ -343,29 +476,49 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     Polyline.prototype.points = points;
     Polyline.prototype._setpoints = _setpoints;
 
-    var Path = function(jsav, raphael, path, props) {
-      this.rObj = raphael.path(path);
+    // var Path = function(jsav, raphael, path, props) {
+    var Path = function(jsav, canvas, path, props){
+      // this.rObj = raphael.path(path);
+
+      d3.select(canvas).append('path')
+        .attr('class', 'path-obj')
+        .attr('d', path)
+        .attr('fill', 'none')
+        .attr('stroke', '#000000');
+
+      this.rObj = d3.selectAll('.path-obj').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
     JSAV.utils.extend(Path, JSAVGraphical);
     Path.prototype.path = function(newPath, options)  {
       if (typeof newPath === "undefined") {
-        return this.rObj.attr("path");
+        // return this.rObj.attr("d");
+        return d3.select(this.rObj).attr('d');
       } else {
-        return this._setattrs({ path: newPath }, options);
+        return this._setattrs({ d : newPath }, options);
       }
     };
 
-    var Set = function(jsav, raphael, props) {
-      this.rObj = raphael.set();
+    // var Set = function(jsav, raphael, props) {
+    var Set = function Set(jsav, canvas, props) {
+      // this.rObj = raphael.set();
+      
+      d3.select(canvas).append('g')
+        .attr('class', 'g-obj')
+
+      this.rObj = d3.selectAll('.g-obj').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
     JSAV.utils.extend(Set, JSAVGraphical);
     var setproto = Set.prototype;
     setproto.push = function(g) {
-      this.rObj.push(g.rObj);
+      // this.rObj.push(g.rObj);
+      // this.rObj.node.appendChild(g.rObj)
+      console.log(this.rObj);
+      d3.select(this.rObj).append(g.rObj);
+      console.log(this.rObj);
       return this;
     };
     var getSvgCanvas = function(jsav, props) {
@@ -554,7 +707,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     }($.fn.hasClass);
     /*! End Keith Wood's utilities */
 
-  }(jQuery, Raphael));
+  }(jQuery, d3));
+  // (jQuery, Raphael));
 
 } else { // end if Raphael !== "undefined"
   // if raphael is not loaded, create dummy functions which warn when using primitives without Raphael
