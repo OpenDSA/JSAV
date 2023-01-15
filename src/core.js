@@ -25,10 +25,12 @@
       this.svg = d3.selectAll('.my-svg').filter(':last-child').node();
 //      this.svg.renderfix();
       
-      this.svg.attr("shape-rendering", "crispEdges");
-      var style = this.svg.canvas.style;
-      style.position = "absolute";
+      d3.select(this.svg).attr("shape-rendering", "crispEdges");
+      
       // this.svg.canvas.style("position", "absolute");
+      var style = this.svg.style;
+      style.position = "absolute";
+      style.overflow = "hidden";
     }
     return this.svg;
   };

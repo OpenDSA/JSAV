@@ -18,6 +18,7 @@ if (typeof d3 !== "undefined"){
       // animated show function
       show: function(options) {
         if (this.css("opacity") !== 1) {
+          
           this.css({"opacity": 1}, options);
         }
       },
@@ -41,6 +42,7 @@ if (typeof d3 !== "undefined"){
             .duration(this.jsav.SPEED);
         } else {
           // this.rObj.transform(transform, options);
+          console.log(options);
           d3.select(this.rObj).attr('transform', options);
         }
         return oldTrans;

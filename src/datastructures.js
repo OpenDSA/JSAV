@@ -239,8 +239,7 @@
     var oldProps = $.extend(true, {}, cssprop),
         el = this.g.rObj,
         newprops;
-    console.log(this.g.rObj);
-    console.log(d3.select(el).attr(cssprop));
+    
     if (typeof cssprop === "string" && typeof value !== "undefined") {
       // oldProps[cssprop] = el.attr(cssprop);
       oldProps[cssprop] = d3.select(el).attr(cssprop);
@@ -251,6 +250,7 @@
         if (cssprop.hasOwnProperty(i)) {
           // oldProps[i] = el.attr(i);
           oldProps[i] = d3.select(el).attr(i);
+          
         }
       }
       newprops = cssprop;
@@ -258,7 +258,8 @@
     if (this.jsav._shouldAnimate()) { // only animate when playing, not when recording
       // el.animate(newprops, this.jsav.SPEED);
 
-      d3.select(el).transition().duration(this.jsav.SPEED).style(newprops);
+      
+      d3.select(el).transition().duration(this.jsav.SPEED).attr(newprops);
     } else {
       // el.attr(newprops);
       d3.select(el).attr(newprops);
@@ -276,7 +277,9 @@
   };
   edgeproto.state = function(newState) {
     if (typeof newState !== "undefined") {
+      console.log(this.g.css);
       this.g.css(newState.a); // set the css of the element
+      console.log(this.g.css);
       JSAV.utils._helpers.setElementClasses(this.element, newState.cls || []); // set classes
       if (newState.l) { // set label
         this.label(newState.l, {record: false});
@@ -362,7 +365,7 @@
         endStrokeAdjust = this.options["arrow-end"]?strokeWidth * ADJUSTMENT_MAGIC:0,
         toPoint = getNodeBorderAtAngle({width: eWidth + endStrokeAdjust, height: eHeight + endStrokeAdjust, x: toX, y: toY},
                                         {x: fromX, y: fromY}, toAngle, endRadius);
-        console.log(this.g.element.css("stroke-width"));
+
     // getNodeBorderAtAngle returns an array [x, y], and movePoints wants the point position
     // in the (poly)line as first item in the array, so we'll create arrays like [0, x, y] and
     // [1, x, y]
