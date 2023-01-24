@@ -36,13 +36,12 @@ if (typeof d3 !== "undefined"){
         var oldTrans = this.rObj.attr("transform")
         if (this.jsav._shouldAnimate()) { // only animate when playing, not when recording
           // this.rObj.animate( { transform: transform }, this.jsav.SPEED);
-          console.log(this.rObj);
+          
           d3.select(this.rObj).transition()
             .attr("transform", transform)
             .duration(this.jsav.SPEED);
         } else {
           // this.rObj.transform(transform, options);
-          console.log(options);
           d3.select(this.rObj).attr('transform', options);
         }
         return oldTrans;
@@ -249,7 +248,6 @@ if (typeof d3 !== "undefined"){
       
       // var currPath = this.rObj.attrs.path,
       
-      
       var currPath = d3.select(this.rObj)
         .attr('path')
         .split(",").map(function(substring) {
@@ -259,7 +257,7 @@ if (typeof d3 !== "undefined"){
           newPoints = this.points(),
           pathElem, i, l;
 
-      
+      console.log(currPath);
       for (i = 0, l = points.length; i < l; i++) {
         var p = points[i];
         pathElem = currPath[p[0]];
@@ -389,9 +387,10 @@ if (typeof d3 !== "undefined"){
         .attr('d', path)
         .attr('fill', 'none')
         .attr('stroke', '#000000')
+        .attr('stroke-width', 1)
         .attr('path', path_string);
 
-      this.rObj = d3.selectAll('.line-obj').filter(":last-child").node();
+      this.rObj = d3.selectAll('path').filter(":last-child").node();
       
       init(this, jsav, props);
       this._points = [[x1, y1], [x2, y2]];
@@ -458,14 +457,14 @@ if (typeof d3 !== "undefined"){
         path += "Z";
       }
       // this.rObj = raphael.path(path);
+      console.log(path);
 
       d3.select(canvas).append('path')
         .attr('class', 'polyline-obj')
-        .attr('d', path)
-        .attr('fill', 'none')
-        .attr('stroke', '#000000');
+        .attr('d', path);
+        
 
-      this.rObj = d3.selectAll('.polyline-obj').filter(":last-child").node();
+      this.rObj = d3.selectAll('path').filter(":last-child").node();
       
       init(this, jsav, props);
       this._points = points;
@@ -482,13 +481,14 @@ if (typeof d3 !== "undefined"){
     var Path = function(jsav, canvas, path, props){
       // this.rObj = raphael.path(path);
 
+      console.log(path);
+
       d3.select(canvas).append('path')
         .attr('class', 'path-obj')
-        .attr('d', path)
-        .attr('fill', 'none')
-        .attr('stroke', '#000000');
+        .attr('d', path);
+        
 
-      this.rObj = d3.selectAll('.path-obj').filter(":last-child").node();
+      this.rObj = d3.selectAll('path').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -712,10 +712,10 @@ if (typeof d3 !== "undefined"){
   }(jQuery, d3));
   // (jQuery, Raphael));
 
-} else { // end if Raphael !== "undefined"
-  // if raphael is not loaded, create dummy functions which warn when using primitives without Raphael
+} else { // end if d3 !== "undefined"
+  // if d3 is not loaded, create dummy functions which warn when using primitives without Raphael
   var error = function() {
-    console.error("You are trying to use graphical primitives but forgot to load Raphael.js.");
+    console.error("You are trying to use graphical primitives but forgot to load d3.js.");
   };
   var g = {};
   var names = ["circle", "rect", "line", "ellipse", "polyline", "polygon", "path", "set"];

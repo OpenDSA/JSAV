@@ -115,7 +115,8 @@
       this.label(this._weight);
     }
     if (visible) {
-      this.g.show();
+      // this.g.show();
+      d3.select(this.g.rObj).attr('opacity', 1);
     }
   };
   JSAV.utils.extend(Edge, JSAVDataStructure);
@@ -125,6 +126,7 @@
       return this.startnode;
     } else {
       this.startnode = node;
+      
       // this.g.rObj.node.setAttribute("data-startnode", this.startnode?this.startnode.id():"");
       this.g.rObj.setAttribute("data-endnode", this.endnode?this.endnode.id():"");
       return this;
@@ -160,18 +162,15 @@
   edgeproto.hide = function(options) {
     if (this.g.isVisible()) {
       // this.g.hide(options);
-      console.log(options);
-      console.log(this.g);
-      d3.select(this.g.rObj).attr('visibility', 'hidden');
+      
+      d3.select(this.g.rObj).attr('opacity', 0);
       if (this._label) { this._label.hide(options); }
     }
   };
   edgeproto.show = function(options) {
     if (!this.g.isVisible()) {
       // this.g.show(options);
-      console.log(options);
-      console.log(this.g);
-      d3.select(this.g.rObj).attr('visibility', 'visible');
+      d3.select(this.g.rObj).attr('opacity', 1);
       if (this._label) { this._label.show(options); }
     }
   };
@@ -352,6 +351,7 @@
         toAngle = normalizeAngle(2*Math.PI - Math.atan2(fromY - toY, fromX - toX)),
         startRadius = parseInt(sElem.css("borderBottomRightRadius"), 10) || 0,
         ADJUSTMENT_MAGIC = 2.2, // magic number to work with "all" stroke widths
+        
         strokeWidth = parseInt(this.g.element.css("stroke-width"), 10),
         // adjustment for the arrow drawn before the end of the edge line
         startStrokeAdjust = this.options["arrow-begin"]? strokeWidth * ADJUSTMENT_MAGIC:0,
@@ -365,7 +365,7 @@
         endStrokeAdjust = this.options["arrow-end"]?strokeWidth * ADJUSTMENT_MAGIC:0,
         toPoint = getNodeBorderAtAngle({width: eWidth + endStrokeAdjust, height: eHeight + endStrokeAdjust, x: toX, y: toY},
                                         {x: fromX, y: fromY}, toAngle, endRadius);
-
+        
     // getNodeBorderAtAngle returns an array [x, y], and movePoints wants the point position
     // in the (poly)line as first item in the array, so we'll create arrays like [0, x, y] and
     // [1, x, y]
@@ -580,9 +580,11 @@
       this.value(newState.v, {record: false});
       JSAV.utils._helpers.setElementClasses(this.element, newState.cls || []);
       this.element.attr("style", newState.css || "");
+      
     } else {
       var state = { v: this.value() },
         style = this.element.attr("style");
+       
       var cls = JSAV.utils._helpers.elementClasses(this.element);
       if (cls.length > 0) {
         state.cls = cls;
