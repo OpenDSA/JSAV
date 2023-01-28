@@ -156,21 +156,23 @@
     }
   };
   edgeproto.clear = function() {
-    // this.g.rObj.remove();
-    d3.select(this.g.rObj).remove();
+    this.g.rObj.remove();
+    // d3.select(this.g.rObj).remove();
   };
   edgeproto.hide = function(options) {
     if (this.g.isVisible()) {
-      // this.g.hide(options);
+      this.g.hide(options);
       
-      d3.select(this.g.rObj).attr('opacity', 0);
+      // d3.select(this.g.rObj).attr('opacity', 0);
       if (this._label) { this._label.hide(options); }
     }
   };
   edgeproto.show = function(options) {
+    console.log(this.g);
+    console.log(options);
     if (!this.g.isVisible()) {
-      // this.g.show(options);
-      d3.select(this.g.rObj).attr('opacity', 1);
+      this.g.show(options);
+      // d3.select(this.g.rObj).attr('opacity', 1);
       if (this._label) { this._label.show(options); }
     }
   };
@@ -268,7 +270,7 @@
   edgeproto.css = function(cssprop, value, options) {
     if (typeof cssprop === "string" && typeof value === "undefined") {
       // return this.g.rObj.attr(cssprop);
-      console.log(d3.select(this.g.rObj).attr(cssprop));
+
       return d3.select(this.g.rObj).attr(cssprop);
     } else {
       return this._setcss(cssprop, value, options);
@@ -276,9 +278,9 @@
   };
   edgeproto.state = function(newState) {
     if (typeof newState !== "undefined") {
-      console.log(this.g.css);
+
       this.g.css(newState.a); // set the css of the element
-      console.log(this.g.css);
+
       JSAV.utils._helpers.setElementClasses(this.element, newState.cls || []); // set classes
       if (newState.l) { // set label
         this.label(newState.l, {record: false});

@@ -164,11 +164,10 @@
           while (curr) { // iterate all SVG objects in Raphael
             
             bbox = curr.getBBox();
-            console.log(bbox);
-            console.log(curr);
+            
             // strokeWidth = curr.attr("stroke-width");
             strokeWidth = d3.select(curr).attr("stroke-width");
-            console.log(strokeWidth);
+            
             maxTop = Math.max(maxTop, bbox.y2 + strokeWidth);
             maxLeft = Math.max(maxLeft, bbox.x2 + strokeWidth);
             curr = curr.next;

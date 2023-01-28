@@ -33,7 +33,7 @@ if (typeof d3 !== "undefined"){
       },
       transform: function(transform, options) {
         // var oldTrans = this.rObj.transform();
-        var oldTrans = this.rObj.attr("transform")
+        var oldTrans = d3.select(this.rObj).attr("transform")
         if (this.jsav._shouldAnimate()) { // only animate when playing, not when recording
           // this.rObj.animate( { transform: transform }, this.jsav.SPEED);
           
@@ -121,13 +121,13 @@ if (typeof d3 !== "undefined"){
       },
       bounds: function() {
         // var bbox = this.rObj.getBBox();
-        var bbox = this.rObj.bounds();
+        var bbox = this.rObj.getBBox();
         return { left: bbox.x, top: bbox.y, width: bbox.width, height: bbox.height };
       },
       id: JSAV._types.JSAVObject.prototype.id,
       clear: function() {
-        // this.rObj.remove();
-        d3.select(this.rObj).remove();
+        this.rObj.remove();
+        // d3.select(this.rObj).remove();
       }
     };
     var graphicalproto = JSAVGraphical.prototype;
@@ -178,12 +178,11 @@ if (typeof d3 !== "undefined"){
       // obj.element = $(obj.rObj.node).data("svgelem", obj.rObj);
 
       obj.element = $(d3.select(obj.rObj).node()).data('svgelem', obj.rObj);
-      
       var prop = $.extend({'visible': true}, props);
       for (var i in prop) {
         if (prop.hasOwnProperty(i)) {
           // obj.rObj.attr(i, prop[i]);
-          d3.select(obj.rObj).attr(i, props[i]);
+          d3.select(obj.rObj).attr(i, prop[i]);
         }
       }
       // if opacity not set manually, we'll hide the object and show it if it
@@ -207,35 +206,56 @@ if (typeof d3 !== "undefined"){
     var translatePoint  = function(point, dx, dy, options) {
       // var currPath = this.rObj.attrs.path,
       // var currPath = d3.select(this.rObj).attr('path');
-      var currPath = d3.select(this.rObj)
-        .attr('path')
-        .split(",").map(function(substring) {
+      // var currPath = d3.select(this.rObj)
+      //   .attr('path')
+      //   .split(",").map(function(substring) {
+      //     return substring.trim().split(" ");
+      //   }),
+
+      var pathString = d3.select(this.rObj)._groups[0][0].getAttribute('path');
+      var currPath = pathString.split(",").map(function(substring) {
           return substring.trim().split(" ");
         }),
           newPath = "",
           pathElem;
+      
+      
+      var path_string = "";
       if (point > currPath.length) { return this; }
       for (var i=0, l=currPath.length; i < l; i++) {
         pathElem = currPath[i];
         if (i === point) {
           newPath += pathElem[0] + " " + (+pathElem[1] + dx) + " " +
                     (+pathElem[2] + dy);
+          path_string += pathElem[0] + " " + (+pathElem[1] + dx) + " " +
+                    (+pathElem[2] + dy);
+          if (pathElem[0] === 'M') {
+            path_string += ',';
+          }
         } else {
+          
           newPath += pathElem.join(' ');
+          path_string += pathElem.join(' ');
+          if (pathElem[0] === 'M'){
+            path_string += ',';
+          }
+          
         }
       }
-      var path_string = "";
-      var mid = newPath.length / 2;
-      for (i = 0; i < mid; i++) {
-        pathElem = newPath[i];
-        path_string += pathElem.join(' ');
-      }
-      path_string += ',';
-      for (i = mid; i < newPath.length; i++) {
-        pathElem = newPath[i];
-        path_string += pathElem.join(' ');
-      }
       console.log(newPath);
+      console.log(path_string);
+      // var path_string = "";
+      // var mid = newPath.length / 2;
+      // for (i = 0; i < mid; i++) {
+      //   pathElem = newPath[i];
+        
+      //   path_string += pathElem.join(' ');
+      // }
+      // path_string += ',';
+      // for (i = mid; i < newPath.length; i++) {
+      //   pathElem = newPath[i];
+      //   path_string += pathElem.join(' ');
+      // }
       this._setattrs({"d": newPath, "path": path_string}, options);
       return this;
     };
@@ -248,16 +268,16 @@ if (typeof d3 !== "undefined"){
       
       // var currPath = this.rObj.attrs.path,
       
-      var currPath = d3.select(this.rObj)
-        .attr('path')
-        .split(",").map(function(substring) {
+      
+
+      var pathString = d3.select(this.rObj)._groups[0][0].getAttribute('path');
+      var currPath = pathString.split(",").map(function(substring) {
           return substring.trim().split(" ");
         }),
           newPath = currPath.slice(),       
           newPoints = this.points(),
           pathElem, i, l;
 
-      console.log(currPath);
       for (i = 0, l = points.length; i < l; i++) {
         var p = points[i];
         pathElem = currPath[p[0]];
@@ -305,12 +325,16 @@ if (typeof d3 !== "undefined"){
       // this.rObj = raphael.circle(x, y, r);
       d3.select(canvas).append('circle')
         .attr('class', 'circle-obj')
-        .attr('x', x)
-        .attr('y', y)
+        .attr('cx', x)
+        .attr('cy', y)
+        .attr('stroke', '#000')
+        .attr('stroke-width', 1)
+        .attr('fill', 'none')
         .attr('r', r);
 
       this.rObj = d3.selectAll('.circle-obj').filter(":last-child").node();
       init(this, jsav, props);
+      
       return this;
     };
     JSAV.utils.extend(Circle, JSAVGraphical);
@@ -318,8 +342,9 @@ if (typeof d3 !== "undefined"){
     cproto.center = function(x, y, options) {
       if (typeof x === "undefined") { // getting center
         // return this.rObj.attr(["cx", "cy"]);
-        return d3.select(this.rObj).attr(['cx', 'cy']);
-      } else if ($.isArray(x) && x.length === 2) {
+        return {'cx': d3.select(this.rObj).attr('cx'), 
+                'cy':d3.select(this.rObj).attr('cy')};
+      } else if ($.isArray(x) && x.length === 2) {        
         this._setattrs({"cx": x[0], "cy": x[1]}, options);
       } else if (typeof y !== "undefined") {
         this._setattrs({"cx": x, "cy": y}, options);
@@ -348,7 +373,10 @@ if (typeof d3 !== "undefined"){
         .attr('y', y)
         .attr("width", w)
         .attr("height", h)
-        .attr("rx", r);
+        .attr("rx", r)
+        .attr('stroke', '#000')
+        .attr('stroke-width', 1)
+        .attr('fill', 'none');
 
       this.rObj = d3.selectAll('.rect-obj').filter(":last-child").node();
       init(this, jsav, props);
@@ -385,10 +413,11 @@ if (typeof d3 !== "undefined"){
       d3.select(canvas).append('path')
         .attr('class', 'line-obj')
         .attr('d', path)
+        .attr('path', path_string)
         .attr('fill', 'none')
-        .attr('stroke', '#000000')
+        .attr('stroke', '#000')
         .attr('stroke-width', 1)
-        .attr('path', path_string);
+        .attr('line-obj', path_string);
 
       this.rObj = d3.selectAll('path').filter(":last-child").node();
       
@@ -419,10 +448,13 @@ if (typeof d3 !== "undefined"){
       
       d3.select(canvas).append('ellipse')
         .attr('class', 'ellipse-obj')
-        .attr('x', x)
-        .attr('y', y)
+        .attr('cx', x)
+        .attr('cy', y)
         .attr("rx", rx)
-        .attr("ry", ry);
+        .attr("ry", ry)
+        .attr('stroke', '#000')
+        .attr('stroke-width', 1)
+        .attr('fill', 'none');
 
       this.rObj = d3.selectAll('.ellipse-obj').filter(":last-child").node();
       init(this, jsav, props);
@@ -434,7 +466,8 @@ if (typeof d3 !== "undefined"){
     ellproto.radius = function(x, y, options) {
       if (typeof x === "undefined") { // getting radius
         // return this.rObj.attr(["rx", "ry"]);
-        return d3.select(this.rObj).attr(['rx','ry']);
+        return {'rx': d3.select(this.rObj).attr('rx'), 
+                'ry':d3.select(this.rObj).attr('ry')};
       } else if ($.isArray(x) && x.length === 2) {
         this._setattrs({"rx": x[0], "ry": x[1]}, options);
       } else if (typeof y !== "undefined") {
@@ -456,15 +489,18 @@ if (typeof d3 !== "undefined"){
       if (close) {
         path += "Z";
       }
-      // this.rObj = raphael.path(path);
       console.log(path);
+      // this.rObj = raphael.path(path);
 
       d3.select(canvas).append('path')
         .attr('class', 'polyline-obj')
+        .attr('stroke', '#000')
+        .attr('stroke-width', 1)
+        .attr('fill', 'none')
         .attr('d', path);
         
 
-      this.rObj = d3.selectAll('path').filter(":last-child").node();
+      this.rObj = d3.selectAll('.polyline-obj').filter(":last-child").node();
       
       init(this, jsav, props);
       this._points = points;
@@ -481,14 +517,14 @@ if (typeof d3 !== "undefined"){
     var Path = function(jsav, canvas, path, props){
       // this.rObj = raphael.path(path);
 
-      console.log(path);
-
       d3.select(canvas).append('path')
         .attr('class', 'path-obj')
+        .attr('stroke', '#000')
+        .attr('stroke-width', 1)
+        .attr('fill', 'none')
         .attr('d', path);
-        
+      this.rObj = d3.selectAll('.path-obj').filter(":last-child").node();
 
-      this.rObj = d3.selectAll('path').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -507,7 +543,7 @@ if (typeof d3 !== "undefined"){
       // this.rObj = raphael.set();
       
       d3.select(canvas).append('g')
-        .attr('class', 'g-obj')
+        .attr('class', 'g-obj');
 
       this.rObj = d3.selectAll('.g-obj').filter(":last-child").node();
       init(this, jsav, props);
@@ -518,9 +554,8 @@ if (typeof d3 !== "undefined"){
     setproto.push = function(g) {
       // this.rObj.push(g.rObj);
       // this.rObj.node.appendChild(g.rObj)
-      console.log(this.rObj);
+      
       d3.select(this.rObj).append(g.rObj);
-      console.log(this.rObj);
       return this;
     };
     var getSvgCanvas = function(jsav, props) {
