@@ -35,11 +35,11 @@ if (typeof d3 !== "undefined"){
         // var oldTrans = this.rObj.transform();
         var oldTrans = d3.select(this.rObj).attr("transform")
         if (this.jsav._shouldAnimate()) { // only animate when playing, not when recording
-          // this.rObj.animate( { transform: transform }, this.jsav.SPEED);
+          this.rObj.animate( { transform: transform }, this.jsav.SPEED);
           
-          d3.select(this.rObj).transition()
-            .attr("transform", transform)
-            .duration(this.jsav.SPEED);
+          // d3.select(this.rObj).transition()
+          //   .attr("transform", transform)
+          //   .duration(this.jsav.SPEED);
         } else {
           // this.rObj.transform(transform, options);
           d3.select(this.rObj).attr('transform', options);
@@ -82,11 +82,11 @@ if (typeof d3 !== "undefined"){
           }
         }
         if (this.jsav._shouldAnimate() && (!options || !options.dontAnimate)) { // only animate when playing, not when recording
-          // this.rObj.animate( props, this.jsav.SPEED);
+          this.rObj.animate( props, this.jsav.SPEED);
           
-          d3.select(this.rObj).transition()
-            .duration(this.jsav.SPEED)
-            .attr(props);
+          // d3.select(this.rObj).transition()
+          //   .duration(this.jsav.SPEED)
+          //   .attr(props);
         } else {
           for (i in props) {
             if (props.hasOwnProperty(i)) {
@@ -324,15 +324,15 @@ if (typeof d3 !== "undefined"){
     var Circle = function(jsav, canvas, x, y, r, props) {
       // this.rObj = raphael.circle(x, y, r);
       d3.select(canvas).append('circle')
-        .attr('class', 'circle-obj')
         .attr('cx', x)
         .attr('cy', y)
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
         .attr('fill', 'none')
+        .attr('opacity', 1)
         .attr('r', r);
 
-      this.rObj = d3.selectAll('.circle-obj').filter(":last-child").node();
+      this.rObj = d3.selectAll('circle').filter(":last-child").node();
       init(this, jsav, props);
       
       return this;
@@ -368,7 +368,6 @@ if (typeof d3 !== "undefined"){
       // this.rObj = raphael.rect(x, y, w, h, r);
       
       d3.select(canvas).append('rect')
-        .attr('class', 'rect-obj')
         .attr('x', x)
         .attr('y', y)
         .attr("width", w)
@@ -376,9 +375,10 @@ if (typeof d3 !== "undefined"){
         .attr("rx", r)
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
+        .attr('opacity', 1)
         .attr('fill', 'none');
 
-      this.rObj = d3.selectAll('.rect-obj').filter(":last-child").node();
+      this.rObj = d3.selectAll('rect').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -411,13 +411,12 @@ if (typeof d3 !== "undefined"){
       
 
       d3.select(canvas).append('path')
-        .attr('class', 'line-obj')
         .attr('d', path)
         .attr('path', path_string)
         .attr('fill', 'none')
         .attr('stroke', '#000')
-        .attr('stroke-width', 1)
-        .attr('line-obj', path_string);
+        .attr('opacity', 1)
+        .attr('stroke-width', 1);
 
       this.rObj = d3.selectAll('path').filter(":last-child").node();
       
@@ -447,16 +446,16 @@ if (typeof d3 !== "undefined"){
       
       
       d3.select(canvas).append('ellipse')
-        .attr('class', 'ellipse-obj')
         .attr('cx', x)
         .attr('cy', y)
         .attr("rx", rx)
         .attr("ry", ry)
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
+        .attr('opacity', 1)
         .attr('fill', 'none');
 
-      this.rObj = d3.selectAll('.ellipse-obj').filter(":last-child").node();
+      this.rObj = d3.selectAll('ellipse').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -482,25 +481,29 @@ if (typeof d3 !== "undefined"){
     // var Polyline = function(jsav, raphael, points, close, props) {
     var Polyline = function Polyline(jsav, canvas, points, close, props) {
       var path = "M ";
+      var path_string = "M "
       for (var i=0, l=points.length; i < l; i++) {
-        if (i) { path += "L";}
+        if (i) { path += "L"; path_string += ",L ";}
         path += points[i][0] + " " + points[i][1];
+        path_string += points[i][0] + " " + points[i][1];
       }
       if (close) {
         path += "Z";
+        path_string += ",Z ";
       }
       console.log(path);
       // this.rObj = raphael.path(path);
 
       d3.select(canvas).append('path')
-        .attr('class', 'polyline-obj')
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
         .attr('fill', 'none')
-        .attr('d', path);
+        .attr('d', path)
+        .attr('opacity', 1)
+        .attr('path', path_string);
         
 
-      this.rObj = d3.selectAll('.polyline-obj').filter(":last-child").node();
+      this.rObj = d3.selectAll('path').filter(":last-child").node();
       
       init(this, jsav, props);
       this._points = points;
@@ -517,13 +520,14 @@ if (typeof d3 !== "undefined"){
     var Path = function(jsav, canvas, path, props){
       // this.rObj = raphael.path(path);
 
+      console.log(path);
       d3.select(canvas).append('path')
-        .attr('class', 'path-obj')
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
         .attr('fill', 'none')
+        .attr('opacity', 1)
         .attr('d', path);
-      this.rObj = d3.selectAll('.path-obj').filter(":last-child").node();
+      this.rObj = d3.selectAll('path').filter(":last-child").node();
 
       init(this, jsav, props);
       return this;
@@ -543,9 +547,9 @@ if (typeof d3 !== "undefined"){
       // this.rObj = raphael.set();
       
       d3.select(canvas).append('g')
-        .attr('class', 'g-obj');
+      .attr('opacity', 1);
 
-      this.rObj = d3.selectAll('.g-obj').filter(":last-child").node();
+      this.rObj = d3.selectAll('g').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -553,9 +557,8 @@ if (typeof d3 !== "undefined"){
     var setproto = Set.prototype;
     setproto.push = function(g) {
       // this.rObj.push(g.rObj);
-      // this.rObj.node.appendChild(g.rObj)
-      
       d3.select(this.rObj).append(g.rObj);
+      this.rObj.node().appendChild(g.rObj)
       return this;
     };
     var getSvgCanvas = function(jsav, props) {

@@ -38,14 +38,13 @@
       if (!this.svg) { // lazily create the SVG overlay only when needed
         // this.svg = new Raphael(this.element[0]);
         
-        d3.select(this.element[0]).append('svg').attr('class', 'my-svg');
-        this.svg = d3.selectAll('.my-svg').filter(':last-child').node();
+        d3.select(this.element[0]).append('svg');
+        this.svg = d3.selectAll('svg').filter(':last-child').node();
         
         //this.svg.renderfix();
-        d3.select(this.svg).attr("shape-rendering", "crispEdges");
+        
         var style = this.svg.style;
         style.position = "absolute";
-        style.overflow = "hidden";
         
       }
       return this.svg;
@@ -99,7 +98,7 @@
 
     var visible = (typeof this.options.display === "boolean" && this.options.display === true);
     // this.g.rObj.attr({"opacity": 0});
-    d3.select(this.g.rObj).attr('opacity', 0);
+    // d3.select(this.g.rObj).attr('opacity', 0);
     this.element.addClass("jsavedge");
     if (start) {      
       this.element[0].setAttribute("data-startnode", this.startnode.id());
@@ -115,8 +114,8 @@
       this.label(this._weight);
     }
     if (visible) {
-      // this.g.show();
-      d3.select(this.g.rObj).attr('opacity', 1);
+      this.g.show();
+      // d3.select(this.g.rObj).attr('opacity', 1);
     }
   };
   JSAV.utils.extend(Edge, JSAVDataStructure);
@@ -127,7 +126,8 @@
     } else {
       this.startnode = node;
       
-      // this.g.rObj.node.setAttribute("data-startnode", this.startnode?this.startnode.id():"");
+      
+      // this.g.rObj.node().setAttribute("data-startnode", this.startnode?this.startnode.id():"");
       this.g.rObj.setAttribute("data-endnode", this.endnode?this.endnode.id():"");
       return this;
     }
@@ -137,7 +137,8 @@
       return this.endnode;
     } else {
       this.endnode = node;
-      // this.g.rObj.node.setAttribute("data-endnode", this.endnode?this.endnode.id():"");
+     
+      // this.g.rObj.node().setAttribute("data-endnode", this.endnode?this.endnode.id():"");
       this.g.rObj.setAttribute("data-endnode", this.endnode?this.endnode.id():"");
       return this;
     }
@@ -168,8 +169,6 @@
     }
   };
   edgeproto.show = function(options) {
-    console.log(this.g);
-    console.log(options);
     if (!this.g.isVisible()) {
       this.g.show(options);
       // d3.select(this.g.rObj).attr('opacity', 1);
@@ -257,10 +256,10 @@
       newprops = cssprop;
     }
     if (this.jsav._shouldAnimate()) { // only animate when playing, not when recording
-      // el.animate(newprops, this.jsav.SPEED);
+      el.animate(newprops, this.jsav.SPEED);
 
       
-      d3.select(el).transition().duration(this.jsav.SPEED).attr(newprops);
+      // d3.select(el).transition().duration(this.jsav.SPEED).attr(newprops);
     } else {
       // el.attr(newprops);
       d3.select(el).attr(newprops);
