@@ -503,7 +503,7 @@ if (typeof d3 !== "undefined"){
         .attr('path', path_string);
         
 
-      this.rObj = d3.selectAll('path').filter(":last-child").node();
+      this.rObj = d3.select(canvas).selectAll('path').filter(":last-child").node();
       
       init(this, jsav, props);
       this._points = points;
@@ -520,7 +520,6 @@ if (typeof d3 !== "undefined"){
     var Path = function(jsav, canvas, path, props){
       // this.rObj = raphael.path(path);
 
-      console.log(path);
       d3.select(canvas).append('path')
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
@@ -592,6 +591,7 @@ if (typeof d3 !== "undefined"){
       },
       polyline: function(points, props) {
         var svgCanvas = getSvgCanvas(this, props);
+        console.log(svgCanvas);
         return new Polyline(this, svgCanvas, points, false, props);
       },
       polygon: function(points, props) {

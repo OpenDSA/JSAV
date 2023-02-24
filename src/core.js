@@ -22,7 +22,7 @@
     if (!this.svg) { // lazily create the SVG overlay only when needed
       //this.svg = Raphael(this.canvas[0]);
       d3.select(this.canvas[0]).append('svg');
-      this.svg = d3.selectAll('svg').filter(':last-child').node();
+      this.svg = d3.select(this.canvas[0]).selectAll('svg').filter(':last-child').node();
 //      this.svg.renderfix();
       
       // this.svg.canvas.style("position", "absolute");
@@ -153,21 +153,27 @@
             maxLeft = Math.max(maxLeft, itemPos.left + $item.outerWidth(true));
           }
         });
+        // var svg_elem = d3.selectAll('svg').nodes().pop();
         if (that.svg) { // handling of SVG
-          var curr = that.svg.bottom, // start from the element in the behind
-              bbox, strokeWidth;
-          // var curr = d3.select(that.svg[last])
+          // var curr = that.svg.bottom, // start from the element in the behind
           //     bbox, strokeWidth;
+          var curr = d3.select(that.svg).selectAll("circle, rect, path, ellipse").
+          filter(function(d, i, nodes) { return i === nodes.length - 1; })
+          .node();
+
+          var bbox, strokeWidth, x2, y2;
           while (curr) { // iterate all SVG objects in Raphael
             
             bbox = curr.getBBox();
             
             // strokeWidth = curr.attr("stroke-width");
-            strokeWidth = d3.select(curr).attr("stroke-width");
-            
-            maxTop = Math.max(maxTop, bbox.y2 + strokeWidth);
-            maxLeft = Math.max(maxLeft, bbox.x2 + strokeWidth);
-            curr = curr.next;
+            strokeWidth = parseInt(d3.select(curr).attr("stroke-width"), 10);
+            x2 = bbox.x + bbox.width;
+            y2 = bbox.y + bbox.height;
+            maxTop = Math.max(maxTop, y2 + strokeWidth);
+            maxLeft = Math.max(maxLeft, x2 + strokeWidth);
+            curr = d3.select(curr.previousSibling).node();
+            // curr = curr.next;
           }
         }
         // limit minWidth to parent width if scroll is set to true
