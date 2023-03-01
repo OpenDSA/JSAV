@@ -39,7 +39,7 @@
         // this.svg = new Raphael(this.element[0]);
         
         d3.select(this.element[0]).append('svg');
-        this.svg = d3.selectAll('svg').filter(':last-child').node();
+        this.svg = d3.select(this.element[0]).selectAll('svg').filter(':last-child').node();
         
         //this.svg.renderfix();
         

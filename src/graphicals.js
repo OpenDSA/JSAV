@@ -332,7 +332,7 @@ if (typeof d3 !== "undefined"){
         .attr('opacity', 1)
         .attr('r', r);
 
-      this.rObj = d3.selectAll('circle').filter(":last-child").node();
+      this.rObj = d3.select(canvas).selectAll('circle').filter(":last-child").node();
       init(this, jsav, props);
       
       return this;
@@ -378,7 +378,7 @@ if (typeof d3 !== "undefined"){
         .attr('opacity', 1)
         .attr('fill', 'none');
 
-      this.rObj = d3.selectAll('rect').filter(":last-child").node();
+      this.rObj = d3.select(canvas).selectAll('rect').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -418,7 +418,7 @@ if (typeof d3 !== "undefined"){
         .attr('opacity', 1)
         .attr('stroke-width', 1);
 
-      this.rObj = d3.selectAll('path').filter(":last-child").node();
+      this.rObj = d3.select(canvas).selectAll('path').filter(":last-child").node();
       
       init(this, jsav, props);
       this._points = [[x1, y1], [x2, y2]];
@@ -455,7 +455,7 @@ if (typeof d3 !== "undefined"){
         .attr('opacity', 1)
         .attr('fill', 'none');
 
-      this.rObj = d3.selectAll('ellipse').filter(":last-child").node();
+      this.rObj = d3.select(canvas).selectAll('ellipse').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
@@ -503,7 +503,7 @@ if (typeof d3 !== "undefined"){
         .attr('path', path_string);
         
 
-      this.rObj = d3.select(canvas).selectAll('path').filter(":last-child").node();
+      this.rObj = d3.select(canvas).select(canvas).selectAll('path').filter(":last-child").node();
       
       init(this, jsav, props);
       this._points = points;
@@ -526,7 +526,7 @@ if (typeof d3 !== "undefined"){
         .attr('fill', 'none')
         .attr('opacity', 1)
         .attr('d', path);
-      this.rObj = d3.selectAll('path').filter(":last-child").node();
+      this.rObj = d3.select(canvas).selectAll('path').filter(":last-child").node();
 
       init(this, jsav, props);
       return this;
@@ -548,7 +548,7 @@ if (typeof d3 !== "undefined"){
       d3.select(canvas).append('g')
       .attr('opacity', 1);
 
-      this.rObj = d3.selectAll('g').filter(":last-child").node();
+      this.rObj = d3.select(canvas).selectAll('g').filter(":last-child").node();
       init(this, jsav, props);
       return this;
     };
