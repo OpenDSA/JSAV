@@ -79,14 +79,20 @@ if (typeof d3 !== "undefined"){
           if (props.hasOwnProperty(i)) {
             // oldProps[i] = this.rObj.attr(i);
             oldProps[i] = d3.select(this.rObj).attr(i);
+            if (i === "opacity" || i === "stroke-width") {
+              oldProps[i] = parseFloat(oldProps[i]);
+            }
           }
         }
         if (this.jsav._shouldAnimate() && (!options || !options.dontAnimate)) { // only animate when playing, not when recording
-          this.rObj.animate( props, this.jsav.SPEED);
+          // this.rObj.animate( props, this.jsav.SPEED);
           
-          // d3.select(this.rObj).transition()
-          //   .duration(this.jsav.SPEED)
-          //   .attr(props);
+          d3.select(this.rObj).transition()
+            .duration(this.jsav.SPEED);
+          
+          for (i in props) {
+            d3.select(this.rObj).attr(i, props[i]);
+          }
         } else {
           for (i in props) {
             if (props.hasOwnProperty(i)) {
@@ -503,7 +509,7 @@ if (typeof d3 !== "undefined"){
         .attr('path', path_string);
         
 
-      this.rObj = d3.select(canvas).select(canvas).selectAll('path').filter(":last-child").node();
+      this.rObj = d3.select(canvas).selectAll('path').filter(":last-child").node();
       
       init(this, jsav, props);
       this._points = points;

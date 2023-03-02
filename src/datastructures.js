@@ -94,11 +94,13 @@
 
  
     // this.element = $(this.g.rObj.node);
+    
     this.element = $(d3.select(this.g.rObj).node());   
 
     var visible = (typeof this.options.display === "boolean" && this.options.display === true);
     // this.g.rObj.attr({"opacity": 0});
-    // d3.select(this.g.rObj).attr('opacity', 0);
+    d3.select(this.g.rObj).attr('opacity', 0)
+    
     this.element.addClass("jsavedge");
     if (start) {      
       this.element[0].setAttribute("data-startnode", this.startnode.id());
@@ -128,7 +130,7 @@
       
       
       // this.g.rObj.node().setAttribute("data-startnode", this.startnode?this.startnode.id():"");
-      this.g.rObj.setAttribute("data-endnode", this.endnode?this.endnode.id():"");
+      this.g.rObj.setAttribute("data-startnode", this.startnode?this.startnode.id():"");
       return this;
     }
   };
