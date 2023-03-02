@@ -79,20 +79,16 @@ if (typeof d3 !== "undefined"){
           if (props.hasOwnProperty(i)) {
             // oldProps[i] = this.rObj.attr(i);
             oldProps[i] = d3.select(this.rObj).attr(i);
-            if (i === "opacity" || i === "stroke-width") {
-              oldProps[i] = parseFloat(oldProps[i]);
-            }
           }
         }
         if (this.jsav._shouldAnimate() && (!options || !options.dontAnimate)) { // only animate when playing, not when recording
           // this.rObj.animate( props, this.jsav.SPEED);
-          
-          d3.select(this.rObj).transition()
-            .duration(this.jsav.SPEED);
-          
+        
           for (i in props) {
             d3.select(this.rObj).attr(i, props[i]);
           }
+          d3.select(this.rObj).transition()
+            .duration(this.jsav.SPEED);
         } else {
           for (i in props) {
             if (props.hasOwnProperty(i)) {
@@ -248,8 +244,7 @@ if (typeof d3 !== "undefined"){
           
         }
       }
-      console.log(newPath);
-      console.log(path_string);
+   
       // var path_string = "";
       // var mid = newPath.length / 2;
       // for (i = 0; i < mid; i++) {
@@ -497,7 +492,6 @@ if (typeof d3 !== "undefined"){
         path += "Z";
         path_string += ",Z ";
       }
-      console.log(path);
       // this.rObj = raphael.path(path);
 
       d3.select(canvas).append('path')
@@ -526,6 +520,7 @@ if (typeof d3 !== "undefined"){
     var Path = function(jsav, canvas, path, props){
       // this.rObj = raphael.path(path);
 
+      console.log(path);
       d3.select(canvas).append('path')
         .attr('stroke', '#000')
         .attr('stroke-width', 1)
@@ -597,7 +592,6 @@ if (typeof d3 !== "undefined"){
       },
       polyline: function(points, props) {
         var svgCanvas = getSvgCanvas(this, props);
-        console.log(svgCanvas);
         return new Polyline(this, svgCanvas, points, false, props);
       },
       polygon: function(points, props) {
