@@ -21,7 +21,13 @@
   jsavproto.getSvg = function() {
     if (!this.svg) { // lazily create the SVG overlay only when needed
       //this.svg = Raphael(this.canvas[0]);
-      d3.select(this.canvas[0]).append('svg');
+      var divStyles = getComputedStyle(this.canvas[0]);
+      var minHeight = divStyles.getPropertyValue("min-height");
+      var minWidth = divStyles.getPropertyValue("min-width");
+      
+      d3.select(this.canvas[0]).append('svg')
+      .attr("width", minWidth)
+      .attr("height", minHeight);
       this.svg = d3.select(this.canvas[0]).selectAll('svg').filter(':last-child').node();
 //      this.svg.renderfix();
       

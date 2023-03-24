@@ -357,7 +357,8 @@
         
         strokeWidth = parseInt(this.g.element.css("stroke-width"), 10),
         // adjustment for the arrow drawn before the end of the edge line
-        startStrokeAdjust = this.options["arrow-begin"]? strokeWidth * ADJUSTMENT_MAGIC:0,
+        // startStrokeAdjust = this.options["arrow-begin"]? strokeWidth * ADJUSTMENT_MAGIC:0,
+        startStrokeAdjust = this.options["marker-begin"]? strokeWidth * ADJUSTMENT_MAGIC:0,
         fromPoint = (options && options.fromPoint)?options.fromPoint:
                                     getNodeBorderAtAngle({width: sWidth + startStrokeAdjust,
                                                           height: sHeight + startStrokeAdjust,
@@ -365,7 +366,8 @@
         // arbitrarily choose to use bottom-right border radius
         endRadius = parseInt(eElem.css("borderBottomRightRadius"), 10) || 0,
         // adjustment for the arrow drawn after the end of the edge line
-        endStrokeAdjust = this.options["arrow-end"]?strokeWidth * ADJUSTMENT_MAGIC:0,
+        // endStrokeAdjust = this.options["arrow-end"]?strokeWidth * ADJUSTMENT_MAGIC:0,
+        endStrokeAdjust = this.options["marker-end"]?strokeWidth * ADJUSTMENT_MAGIC:0,
         toPoint = getNodeBorderAtAngle({width: eWidth + endStrokeAdjust, height: eHeight + endStrokeAdjust, x: toX, y: toY},
                                         {x: fromX, y: fromY}, toAngle, endRadius);
         
