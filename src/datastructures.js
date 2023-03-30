@@ -38,8 +38,10 @@
       if (!this.svg) { // lazily create the SVG overlay only when needed
         // this.svg = new Raphael(this.element[0]);
         
-        d3.select(this.element[0]).append('svg');
-        this.svg = d3.select(this.element[0]).selectAll('svg').filter(':last-child').node();
+        // d3.select(this.element[0]).append('svg');
+        // this.svg = d3.select(this.element[0]).selectAll('svg').filter(':last-child').node();
+
+        this.svg = d3.select(this.element[0]).append('svg').node();
         
         //this.svg.renderfix();
         
@@ -92,10 +94,8 @@
       
     }
 
- 
-    // this.element = $(this.g.rObj.node);
-    
-    this.element = $(d3.select(this.g.rObj).node());   
+
+    this.element = $(this.g.rObj);
 
     var visible = (typeof this.options.display === "boolean" && this.options.display === true);
     // this.g.rObj.attr({"opacity": 0});

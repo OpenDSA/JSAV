@@ -21,14 +21,10 @@
   jsavproto.getSvg = function() {
     if (!this.svg) { // lazily create the SVG overlay only when needed
       //this.svg = Raphael(this.canvas[0]);
-      var divStyles = getComputedStyle(this.canvas[0]);
-      var minHeight = divStyles.getPropertyValue("min-height");
-      var minWidth = divStyles.getPropertyValue("min-width");
       
-      d3.select(this.canvas[0]).append('svg')
-      .attr("width", minWidth)
-      .attr("height", minHeight);
-      this.svg = d3.select(this.canvas[0]).selectAll('svg').filter(':last-child').node();
+      // d3.select(this.canvas[0]).append('svg')
+      // this.svg = d3.select(this.canvas[0]).selectAll('svg').filter(':last-child').node();
+      this.svg = d3.select(this.canvas[0]).append('svg').node();
 //      this.svg.renderfix();
       
       // this.svg.canvas.style("position", "absolute");
@@ -169,7 +165,13 @@
 
           var bbox, strokeWidth, x2, y2;
           while (curr) { // iterate all SVG objects in Raphael
-            
+
+            // Ignore markers object
+            if (curr.id.includes("arrow-style")) {
+              curr = d3.select(curr.previousSibling).node();
+              continue;
+            }
+
             bbox = curr.getBBox();
             
             // strokeWidth = curr.attr("stroke-width");
