@@ -21,14 +21,14 @@
   jsavproto.getSvg = function() {
     if (!this.svg) { // lazily create the SVG overlay only when needed
       //this.svg = Raphael(this.canvas[0]);
-      
-      // d3.select(this.canvas[0]).append('svg')
-      // this.svg = d3.select(this.canvas[0]).selectAll('svg').filter(':last-child').node();
-      this.svg = d3.select(this.canvas[0]).append('svg').node();
+      const container = d3.select(this.canvas[0]);
+      this.svg = container.insert('svg', ':first-child').node();
+
 //      this.svg.renderfix();
       
       // this.svg.canvas.style("position", "absolute");
       var style = this.svg.style;
+      style.overflow = "hidden";
       style.position = "absolute";
     }
     return this.svg;
@@ -151,6 +151,7 @@
               itemPos = $item.position();
           // ignore SVG, since it will be handled differently since it's sized 100%x100%
           if (item.nodeName.toLowerCase() !== "svg") {
+            
             maxTop = Math.max(maxTop, itemPos.top + $item.outerHeight(true));
             maxLeft = Math.max(maxLeft, itemPos.left + $item.outerWidth(true));
           }
@@ -159,7 +160,7 @@
         if (that.svg) { // handling of SVG
           // var curr = that.svg.bottom, // start from the element in the behind
           //     bbox, strokeWidth;
-          var curr = d3.select(that.svg).selectAll("circle, rect, path, ellipse").
+          var curr = d3.select(that.svg).selectAll("*").
           filter(function(d, i, nodes) { return i === nodes.length - 1; })
           .node();
 

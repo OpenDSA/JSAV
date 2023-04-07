@@ -38,14 +38,13 @@
       if (!this.svg) { // lazily create the SVG overlay only when needed
         // this.svg = new Raphael(this.element[0]);
         
-        // d3.select(this.element[0]).append('svg');
-        // this.svg = d3.select(this.element[0]).selectAll('svg').filter(':last-child').node();
-
-        this.svg = d3.select(this.element[0]).append('svg').node();
+        const container = d3.select(this.element[0]);
+        this.svg = container.insert('svg', ':first-child').node();
         
         //this.svg.renderfix();
         
         var style = this.svg.style;
+        style.overflow = "hidden";
         style.position = "absolute";
         
       }
@@ -94,7 +93,7 @@
       
     }
 
-
+    
     this.element = $(this.g.rObj);
 
     var visible = (typeof this.options.display === "boolean" && this.options.display === true);

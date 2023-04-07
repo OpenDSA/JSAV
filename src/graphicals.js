@@ -32,14 +32,55 @@ if (typeof d3 !== "undefined") {
       },
       transform: function (transform, options) {
         // var oldTrans = this.rObj.transform();
-        var oldTrans = d3.select(this.rObj).attr("transform");
+        const oldTrans = d3.select(this.rObj).attr('transform');
+
+        
+
         if (this.jsav._shouldAnimate()) {
           // only animate when playing, not when recording
-          this.rObj.animate({ transform: transform }, this.jsav.SPEED);
+          // this.rObj.animate({ transform: transform }, this.jsav.SPEED);
+          const raphaelToD3Transform = (transformStr) => {
+            console.log(transformStr);
+            const bbox = this.rObj.getBBox();
+            const centerX = bbox.x + bbox.width / 2;
+            const centerY = bbox.y + bbox.height / 2;
+          
+            let d3TransformStr = transformStr.replace(/r(-?\d+)/g, (match, degrees) => {
+              return `rotate(${degrees},${centerX},${centerY})`;
+            });
+  
+            d3TransformStr = d3TransformStr.replace(/s(-?\d*\.?\d+),(-?\d*\.?\d+)/g, (match, sx, sy) => {
+              return `scale(${sx},${sy})`;
+            });
+          
+            d3TransformStr = d3TransformStr.replace(/t(-?\d*\.?\d+),(-?\d*\.?\d+)/g, (match, tx, ty) => {
+              return `translate(${tx},${ty})`;
+            });
+  
+            return d3TransformStr;
+          };
+  
+          const applyTransform = (originalTransform, newTransform, position) => {
+            if (position === 'prepend') {
+              return newTransform + ' ' + originalTransform;
+            } else if (position === 'append') {
+              return originalTransform + ' ' + newTransform;
+            } else {
+              return newTransform;
+            }
+          };
+  
+          const parts = transform.split('...');
+          let d3Transform = raphaelToD3Transform(parts[0]);
+  
+          for (let i = 1; i < parts.length; i++) {
+            const position = i % 2 === 1 ? 'prepend' : 'append';
+            d3Transform = applyTransform(d3Transform, raphaelToD3Transform(parts[i]), position);
+          }
 
-          // d3.select(this.rObj).transition()
-          //   .attr("transform", transform)
-          //   .duration(this.jsav.SPEED);
+          d3.select(this.rObj).transition()
+            .attr("transform", d3Transform)
+            .duration(this.jsav.SPEED);
         } else {
           // this.rObj.transform(transform, options);
           d3.select(this.rObj).attr("transform", options);
