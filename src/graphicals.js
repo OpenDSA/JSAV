@@ -34,13 +34,10 @@ if (typeof d3 !== "undefined") {
         // var oldTrans = this.rObj.transform();
         const oldTrans = d3.select(this.rObj).attr('transform');
 
-        
-
         if (this.jsav._shouldAnimate()) {
           // only animate when playing, not when recording
           // this.rObj.animate({ transform: transform }, this.jsav.SPEED);
           const raphaelToD3Transform = (transformStr) => {
-            console.log(transformStr);
             const bbox = this.rObj.getBBox();
             const centerX = bbox.x + bbox.width / 2;
             const centerY = bbox.y + bbox.height / 2;
@@ -82,19 +79,17 @@ if (typeof d3 !== "undefined") {
             .attr("transform", d3Transform)
             .duration(this.jsav.SPEED);
         } else {
-          // this.rObj.transform(transform, options);
-          d3.select(this.rObj).attr("transform", options);
+          this.rObj.transform(transform, options);
+          // d3.select(this.rObj).attr("transform", options);
         }
         return oldTrans;
       },
       rotate: JSAV.anim(function (deg) {
         this.transform("...r" + deg);
-        // this.transition().attr("rotate", "...r" + deg);
         return [0 - deg];
       }),
       scale: JSAV.anim(function (sx, sy) {
         this.transform("...S" + sx + "," + sy);
-        // this.transition().attr("scale", "...S" + sx + "," + sy);
         return [1.0 / sx, 1.0 / sy];
       }),
       scaleX: function (sx, options) {
@@ -105,7 +100,6 @@ if (typeof d3 !== "undefined") {
       },
       translate: JSAV.anim(function (dx, dy, options) {
         this.transform("...T" + dx + "," + dy);
-        // this.transition().attr("translate", "...T" + dx + "," + dy);
         return [0 - dx, 0 - dy];
       }),
       translateX: function (dx, options) {

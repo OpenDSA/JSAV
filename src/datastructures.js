@@ -93,12 +93,12 @@
       
     }
 
-    
+
     this.element = $(this.g.rObj);
 
     var visible = (typeof this.options.display === "boolean" && this.options.display === true);
     // this.g.rObj.attr({"opacity": 0});
-    d3.select(this.g.rObj).attr('opacity', 0)
+    d3.select(this.g.rObj).attr('opacity', 0);
     
     this.element.addClass("jsavedge");
     if (start) {      
