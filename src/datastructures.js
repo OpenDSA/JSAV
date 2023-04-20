@@ -273,7 +273,7 @@
 
       return d3.select(this.g.rObj).attr(cssprop);
     } else {
-      return this._setcss(cssprop, value, options);
+      return this._setattrs(cssprop, value, options);
     }
   };
   edgeproto.state = function(newState) {

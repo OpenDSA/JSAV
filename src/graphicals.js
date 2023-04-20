@@ -17,18 +17,21 @@ if (typeof d3 !== "undefined") {
       // utility function that actually implements hide
       // animated show function
       show: function (options) {
-        if (this.css("opacity") !== 1) {
+        var opa = parseInt(this.css("opacity"));
+        if (opa !== 1) {
           this.css({ opacity: 1 }, options);
         }
       },
       // animated hide function
       hide: function (options) {
-        if (this.css("opacity") !== 0) {
+        var opa = parseInt(this.css("opacity"));
+        if (opa !== 0) {
           this.css({ opacity: 0 }, options);
         }
       },
       isVisible: function (options) {
-        return this.css("opacity") !== 0;
+        var opa = parseInt(this.css("opacity"));
+        return opa !== 0;
       },
       transform: function (transform, options) {
         // var oldTrans = this.rObj.transform();
@@ -234,7 +237,7 @@ if (typeof d3 !== "undefined") {
       obj.element = $(obj.rObj).data("svgelem", obj.rObj);
 
       // obj.element = $(d3.select(obj.rObj).node()).data('svgelem', obj.rObj);
-      var prop = $.extend({ visible: true }, props);
+      var prop = $.extend({'visible': true}, props);
       for (var i in prop) {
         if (prop.hasOwnProperty(i)) {
           // obj.rObj.attr(i, prop[i]);
@@ -652,9 +655,7 @@ if (typeof d3 !== "undefined") {
     var Set = function Set(jsav, canvas, props) {
       // this.rObj = raphael.set();
 
-      d3.select(canvas).append("g").attr("opacity", 1);
-
-      this.rObj = d3.select(canvas).selectAll("g").filter(":last-child").node();
+      this.rObj = d3.select(canvas).append("set").node();
       init(this, jsav, props);
       return this;
     };
