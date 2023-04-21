@@ -116,7 +116,6 @@
     }
     if (visible) {
       this.g.show();
-      // d3.select(this.g.rObj).attr('opacity', 1);
     }
   };
   JSAV.utils.extend(Edge, JSAVDataStructure);
@@ -126,7 +125,6 @@
       return this.startnode;
     } else {
       this.startnode = node;
-      
       
       // this.g.rObj.node().setAttribute("data-startnode", this.startnode?this.startnode.id():"");
       this.g.rObj.setAttribute("data-startnode", this.startnode?this.startnode.id():"");
@@ -159,20 +157,16 @@
   };
   edgeproto.clear = function() {
     this.g.rObj.remove();
-    // d3.select(this.g.rObj).remove();
   };
   edgeproto.hide = function(options) {
     if (this.g.isVisible()) {
       this.g.hide(options);
-      
-      // d3.select(this.g.rObj).attr('opacity', 0);
       if (this._label) { this._label.hide(options); }
     }
   };
   edgeproto.show = function(options) {
     if (!this.g.isVisible()) {
       this.g.show(options);
-      // d3.select(this.g.rObj).attr('opacity', 1);
       if (this._label) { this._label.show(options); }
     }
   };
@@ -257,10 +251,11 @@
       newprops = cssprop;
     }
     if (this.jsav._shouldAnimate()) { // only animate when playing, not when recording
-      el.animate(newprops, this.jsav.SPEED);
-
-      
-      // d3.select(el).transition().duration(this.jsav.SPEED).attr(newprops);
+      // el.animate(newprops, this.jsav.SPEED);
+      for (i in newprops) {
+        d3.select(this.rObj).attr(i, newprops[i]);
+      }
+      d3.select(this.rObj).transition().duration(this.jsav.SPEED);
     } else {
       // el.attr(newprops);
       d3.select(el).attr(newprops);
@@ -270,7 +265,6 @@
   edgeproto.css = function(cssprop, value, options) {
     if (typeof cssprop === "string" && typeof value === "undefined") {
       // return this.g.rObj.attr(cssprop);
-
       return d3.select(this.g.rObj).attr(cssprop);
     } else {
       return this._setattrs(cssprop, value, options);

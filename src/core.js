@@ -181,8 +181,9 @@
             y2 = bbox.y + bbox.height;
             maxTop = Math.max(maxTop, y2 + strokeWidth);
             maxLeft = Math.max(maxLeft, x2 + strokeWidth);
-            curr = d3.select(curr.previousSibling).node();
             // curr = curr.next;
+            curr = d3.select(curr.previousSibling).node();
+
           }
         }
         // limit minWidth to parent width if scroll is set to true

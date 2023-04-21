@@ -83,7 +83,6 @@ if (typeof d3 !== "undefined") {
             .duration(this.jsav.SPEED);
         } else {
           this.rObj.transform(transform, options);
-          // d3.select(this.rObj).attr("transform", options);
         }
         return oldTrans;
       },
@@ -122,7 +121,6 @@ if (typeof d3 !== "undefined") {
         if (this.jsav._shouldAnimate() && (!options || !options.dontAnimate)) {
           // only animate when playing, not when recording
           // this.rObj.animate( props, this.jsav.SPEED);
-
           for (i in props) {
             d3.select(this.rObj).attr(i, props[i]);
           }
@@ -233,7 +231,6 @@ if (typeof d3 !== "undefined") {
     var init = function (obj, jsav, props) {
       obj.jsav = jsav;
       // obj.element = $(obj.rObj.node).data("svgelem", obj.rObj);
-
       obj.element = $(obj.rObj).data("svgelem", obj.rObj);
 
       // obj.element = $(d3.select(obj.rObj).node()).data('svgelem', obj.rObj);
@@ -264,12 +261,6 @@ if (typeof d3 !== "undefined") {
     // translated.
     var translatePoint = function (point, dx, dy, options) {
       // var currPath = this.rObj.attrs.path,
-      // var currPath = d3.select(this.rObj).attr('path');
-      // var currPath = d3.select(this.rObj)
-      //   .attr('path')
-      //   .split(",").map(function(substring) {
-      //     return substring.trim().split(" ");
-      //   }),
 
       var pathString = d3.select(this.rObj)._groups[0][0].getAttribute("path");
       var currPath = pathString.split(",").map(function (substring) {
@@ -301,18 +292,6 @@ if (typeof d3 !== "undefined") {
         }
       }
 
-      // var path_string = "";
-      // var mid = newPath.length / 2;
-      // for (i = 0; i < mid; i++) {
-      //   pathElem = newPath[i];
-
-      //   path_string += pathElem.join(' ');
-      // }
-      // path_string += ',';
-      // for (i = mid; i < newPath.length; i++) {
-      //   pathElem = newPath[i];
-      //   path_string += pathElem.join(' ');
-      // }
       this._setattrs({ d: newPath, path: path_string }, options);
       return this;
     };
@@ -547,8 +526,6 @@ if (typeof d3 !== "undefined") {
     // var Ellipse = function(jsav, raphael, x, y, rx, ry, props) {
     var Ellipse = function Ellipse(jsav, canvas, x, y, rx, ry, props) {
       // this.rObj = raphael.ellipse(x, y, rx, ry);
-
-      
       this.rObj = d3.select(canvas)
           .append("ellipse")
           .attr("cx", x)
