@@ -173,16 +173,36 @@
               continue;
             }
 
-            bbox = curr.getBBox();
+            if (curr.tagName === "set") {
+              const children = d3.select(curr).selectChildren();
+              children.each(function() {
+                bbox = this.getBBox();
             
-            // strokeWidth = curr.attr("stroke-width");
-            strokeWidth = parseInt(d3.select(curr).attr("stroke-width"), 10);
-            x2 = bbox.x + bbox.width;
-            y2 = bbox.y + bbox.height;
-            maxTop = Math.max(maxTop, y2 + strokeWidth);
-            maxLeft = Math.max(maxLeft, x2 + strokeWidth);
-            // curr = curr.next;
-            curr = d3.select(curr.previousSibling).node();
+                // strokeWidth = curr.attr("stroke-width");
+                strokeWidth = parseInt(d3.select(this).attr("stroke-width"), 10);
+                x2 = bbox.x + bbox.width;
+                y2 = bbox.y + bbox.height;
+                maxTop = Math.max(maxTop, y2 + strokeWidth);
+                maxLeft = Math.max(maxLeft, x2 + strokeWidth);
+              });
+              curr = d3.select(curr.previousSibling).node();
+            }
+            else {
+              bbox = curr.getBBox();
+            
+                // strokeWidth = curr.attr("stroke-width");
+                strokeWidth = parseInt(d3.select(curr).attr("stroke-width"), 10);
+                x2 = bbox.x + bbox.width;
+                y2 = bbox.y + bbox.height;
+                maxTop = Math.max(maxTop, y2 + strokeWidth);
+                maxLeft = Math.max(maxLeft, x2 + strokeWidth);
+                // curr = curr.next;
+                
+                curr = d3.select(curr.previousSibling).node();
+            }
+
+            
+           
 
           }
         }
