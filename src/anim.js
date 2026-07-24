@@ -205,6 +205,14 @@
       logAnimEvent("jsav-end");
     };
     if ($controls.size() !== 0) {
+      // allow stepping the slideshow with the left/right arrow keys
+      this.container[0].addEventListener("keydown", function(e) {
+        if (e.keyCode == 37) {
+          backwardHandler(e);
+        } else if (e.keyCode == 39) {
+          forwardHandler(e);
+        }
+      });
       var tmpTranslation = this._translate("beginButtonTitle");
       $("<span class='jsavbegin' title='" + tmpTranslation + "'>&lt;&lt;</span>").click(beginHandler).appendTo($controls);
       tmpTranslation = this._translate("backwardButtonTitle");
