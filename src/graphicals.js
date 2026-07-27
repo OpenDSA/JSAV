@@ -137,13 +137,13 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         this.element.on(eventType, function(e) {
           // log the event
           self.jsav.logEvent({type: "jsav-graphical-" + eventType, objid: self.id()});
-          if ($.isFunction(data)) { // if no custom data..
+          if (typeof data === "function") { // if no custom data..
             // ..bind this to the graphical primitive and call handler
             // with the event as param
             data.call(self, e);
-          } else if ($.isFunction(handler)) { // if custom data is passed
+          } else if (typeof handler === "function") { // if custom data is passed
             // ..bind this to the graphical primitive and call handler
-            var params = $.isArray(data)?data.slice(0):[data]; // get a cloned data array or data as array
+            var params = Array.isArray(data)?data.slice(0):[data]; // get a cloned data array or data as array
             params.push(e); // jQuery event as the last
             handler.apply(self, params); // apply the function
           }
@@ -248,7 +248,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     cproto.center = function(x, y, options) {
       if (typeof x === "undefined") { // getting center
         return this.rObj.attr(["cx", "cy"]);
-      } else if ($.isArray(x) && x.length === 2) {
+      } else if (Array.isArray(x) && x.length === 2) {
         this._setattrs({"cx": x[0], "cy": x[1]}, options);
       } else if (typeof y !== "undefined") {
         this._setattrs({"cx": x, "cy": y}, options);
@@ -301,7 +301,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     Line.prototype.translatePoint = translatePoint;
     Line.prototype._polylineMovePoints = movePoints;
     Line.prototype.movePoints = function(newx1, newy1, newx2, newy2) {
-      if ($.isArray(newx1)) {
+      if (Array.isArray(newx1)) {
         // assume it's an array suitable for "general" movePoints
         return this._polylineMovePoints(newx1);
       } else {
@@ -323,7 +323,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     ellproto.radius = function(x, y, options) {
       if (typeof x === "undefined") { // getting radius
         return this.rObj.attr(["rx", "ry"]);
-      } else if ($.isArray(x) && x.length === 2) {
+      } else if (Array.isArray(x) && x.length === 2) {
         this._setattrs({"rx": x[0], "ry": x[1]}, options);
       } else if (typeof y !== "undefined") {
         this._setattrs({"rx": x, "ry": y}, options);

@@ -94,7 +94,7 @@
   treeproto.css = JSAV.utils._helpers.css;
   treeproto._setcss = JSAV.anim(JSAV.utils._helpers._setcss);
   treeproto.show = function(options) {
-    if (this.element.filter(":visible").size() === 0) {
+    if (this.element.filter(":visible").length === 0) {
       this._toggleVisible(options);
     }
     var opts = $.extend({recursive: true}, options);
@@ -105,7 +105,7 @@
   };
   /* hides an element */
   treeproto.hide = function(options) {
-    if (this.element.filter(":visible").size() > 0) {
+    if (this.element.filter(":visible").length > 0) {
       this._toggleVisible(options);
     }
     var opts = $.extend({recursive: true}, options);
@@ -381,7 +381,7 @@
     return this.childnodes;
   };
   nodeproto.show = function(options) {
-    if (this.element.filter(":visible").size() === 0) {
+    if (this.element.filter(":visible").length === 0) {
       this._toggleVisible(options);
     }
     var opts = $.extend({recursive: true}, options);
@@ -401,7 +401,7 @@
   nodeproto.hide = function(options) {
     var opts = $.extend({recursive: true}, options),
         ch, i, l;
-    if (this.element.filter(":visible").size() > 0) {
+    if (this.element.filter(":visible").length > 0) {
       this._toggleVisible(options);
     }
     if (this._edgetoparent) {
