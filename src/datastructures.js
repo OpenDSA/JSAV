@@ -17,7 +17,7 @@
       arg;
     for (var i = 0; i < arguments.length; i++) {
       arg = arguments[i];
-      if ($.isArray(arg)) {
+      if (Array.isArray(arg)) {
         for (var j = 0; j < arg.length; j++) {
           res[arg[j]] = this.css(arg[j]);
         }
@@ -157,7 +157,7 @@
   };
   edgeproto.label = function(newLabel, options) {
     if (typeof newLabel === "undefined") {
-      if (this._label && this._label.element.filter(":visible").size() > 0) {
+      if (this._label && this._label.element.filter(":visible").length > 0) {
         return this._label.text();
       } else {
         return undefined;
@@ -335,7 +335,7 @@
     // [1, x, y]
     this.g.movePoints([[0].concat(fromPoint), [1].concat(toPoint)], options);
 
-    if ($.isFunction(this._labelPositionUpdate)) {
+    if (typeof this._labelPositionUpdate === "function") {
       var bbtop = Math.min(fromPoint[1], toPoint[1]),
           bbleft = Math.min(fromPoint[0], toPoint[0]),
           bbwidth = Math.abs(fromPoint[0] - toPoint[0]),

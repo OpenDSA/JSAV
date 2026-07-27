@@ -74,7 +74,7 @@
 
     this.container.addClass("jsavcontainer");
     this.canvas = this.container.find(".jsavcanvas");
-    if (this.canvas.size() === 0) {
+    if (this.canvas.length === 0) {
       this.canvas = $("<div />").addClass("jsavcanvas").appendTo(this.container);
     }
     // element used to block events when animating
@@ -93,7 +93,7 @@
   function initializations(jsav, options) {
     var fs = JSAV.init.functions;
     for (var i = 0; i < fs.length; i++) {
-      if ($.isFunction(fs[i])) {
+      if (typeof fs[i] === "function") {
         fs[i].call(jsav, options);
       }
     }
