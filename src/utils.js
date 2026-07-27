@@ -28,7 +28,7 @@
     }
   };
   objproto.bounds = function(recalculate, options) {
-    if (recalculate && $.isFunction(this.layout)) {
+    if (recalculate && typeof this.layout === "function") {
       return this.layout($.extend({boundsOnly: true}, options));
     } else {
       var pos = this.position();
@@ -40,7 +40,7 @@
   };
   objproto.isVisible = function() {
     // use the jquery :visible pseudo filter for checking for visibility
-    return this.element.filter(":visible").size() > 0;
+    return this.element.filter(":visible").length > 0;
   };
   objproto.clear = function() {
     if (this.element) {
@@ -81,7 +81,7 @@
   };
   objproto._registerMoveListener = function(callback) {
     // if callback isn't a function, do nothing
-    if (!$.isFunction(callback)) { return; }
+    if (typeof callback !== "function") { return; }
     // register the callback as an event handler for jsav-move-object
     this._moveListeners = (this._moveListeners || 0) + 1;
     this.element.on("jsav-object-move", callback);
@@ -170,7 +170,7 @@
       }
       eventData.currentStep = this.currentStep();
     }
-    if ($.isFunction(this.options.logEvent)) {
+    if (typeof this.options.logEvent === "function") {
       this.options.logEvent(eventData);
     } else {
       $("body").trigger("jsav-log-event", [eventData]);
@@ -212,7 +212,7 @@
         attrOptions = ["width", "height", "minWidth", "minHeight", "maxWidth", "maxHeight"];
     if (typeof html === "string") {
       $dialog.html(html);
-    } else if ($.isFunction(html)) {
+    } else if (typeof html === "function") {
       $dialog.html(html());
     } else {
       $dialog.append(html); // jquery or dom element
@@ -241,7 +241,7 @@
         $modalElem.detach();
       }
       $dialog.remove();
-      if ($.isFunction(options.closeCallback)) {
+      if (typeof options.closeCallback === "function") {
         options.closeCallback();
       }
     };
@@ -794,9 +794,9 @@ mixkey(math.random(), pool);
   // filter (number, array of numbers, or filter function)
   _helpers.getIndices = function($elems, indices) {
     if (typeof indices === "undefined") { return $elems; } // use all if no restrictions are given
-    if ($.isFunction(indices)) { // use a filter function..
+    if (typeof indices === "function") { // use a filter function..
       return $elems.filter(indices); // ..and let jQuery do the work
-    } else if ($.isArray(indices)) {
+    } else if (Array.isArray(indices)) {
       // return indices that are in the array
       return $elems.filter(function(index, item) {
         for (var i=0; i < indices.length; i++) {
@@ -824,14 +824,14 @@ mixkey(math.random(), pool);
     if (typeof test !== "undefined") {
       $normElems = $normElems.filter(test);
     }
-    for (i = 0, l = $normElems.size(); i < l; i++) {
+    for (i = 0, l = $normElems.length; i < l; i++) {
       normIndices.push($elems.index($normElems.get(i)));
     }
     return normIndices;
   };
   _helpers.cssEquals = function(jsavObj1, jsavObj2, cssProps) {
     var cssprop, i;
-    if ($.isArray(cssProps)) { // array of property names
+    if (Array.isArray(cssProps)) { // array of property names
       for (i = 0; i < cssProps.length; i++) {
         cssprop = cssProps[i];
         if (jsavObj1.css(cssprop) !== jsavObj2.css(cssprop)) { return false; }
@@ -844,7 +844,7 @@ mixkey(math.random(), pool);
   };
   _helpers.classEquals = function(jsavObj1, jsavObj2, classNames) {
     var clazzname, i, l;
-    if ($.isArray(classNames)) { // array of property names
+    if (Array.isArray(classNames)) { // array of property names
       for (i = 0, l = classNames.length; i < l; i++) {
         clazzname = classNames[i];
         if (jsavObj1.hasClass(clazzname) !== jsavObj2.hasClass(clazzname)) {
@@ -928,7 +928,7 @@ mixkey(math.random(), pool);
     // and we will make the animation simpler and sum those changes and move the jsavobj once
     var leftSum = 0,
         topSum = 0,
-        callbackFunc = options && $.isFunction(options.callback);
+        callbackFunc = options && typeof options.callback === "function";
 
     // handler for the jsav-updaterelative event, this is when the jsavobj is finally moved
     var updaterelativehandle = function() {
@@ -989,7 +989,7 @@ mixkey(math.random(), pool);
     // and also call the callback with the position change if we have one
     if (jsavobj._relativehandle) {
       var move = animateToNewRelativePosition(jsavobj, relElem, offsetLeft, offsetTop, anchor, myAnchor);
-      if ($.isFunction(options.callback)) {
+      if (typeof options.callback === "function") {
         options.callback(move.left, move.top);
       }
     } else { // set the initial position to the current position (to prevent unnecessary animations)

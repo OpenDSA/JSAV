@@ -220,14 +220,14 @@
     },
     /* shows an element */
     show: function(options) {
-      if (this.element.filter(":visible").size() === 0) {
+      if (this.element.filter(":visible").length === 0) {
         this._toggleVisible(options);
       }
       return this;
     },
     /* hides an element */
     hide: function(options) {
-      if (this.element.filter(":visible").size() > 0) {
+      if (this.element.filter(":visible").length > 0) {
         this._toggleVisible(options);
       }
       return this;
