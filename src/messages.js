@@ -101,7 +101,7 @@
 
   var soundSettings = function(jsav) {
     // creating the button element
-    var $elem = $("<button class='jsavsound soundOff'></button>");
+    var $elem = $("<button aria-label='Sound' class='jsavsound soundOff'></button>");
     // Sound button click event
     $elem.click(function() {
       for (var j = 0; j < window.length; j++) {

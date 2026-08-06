@@ -899,7 +899,7 @@
           this.rightCDims[i] = null;
         }
         this.rightCDims = $.map(this.rightCDims, function(item) {return item;});
-        middle = this.rightCDims[nextIndex];
+        middle = this.rightCDims[nextIndex - 1];
 
         for (i = 0, l=other.rightCDims.length; i < l; i++) {
           var item = other.rightCDims[i];
