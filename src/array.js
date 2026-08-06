@@ -475,7 +475,7 @@
       var valelem = this.element.find("li .jsavvalue").eq(index),
           lielem = valelem.parent();
       if (valelem.length === 0 ) { return; } // no such index
-      var opts = $.extend({startIndex: 0, endIndex: this.length - 1}, options);
+      var opts = $.extend({startIndex: 0, endIndex: this.size() - 1}, options);
 
       var $mark = lielem.find(".jsavmark"),
           $markline = lielem.find(".jsavmarkline");
@@ -585,7 +585,7 @@
       $items = $arr.find("li.jsavindex"),//.css({"position":"relative", "float": "left"}),
       maxValue = Number.MIN_VALUE,
       width = $items.first().outerWidth(),
-      size = array.length;
+      size = array.size();
     for (var i = 0; i < size; i++) {
       maxValue = Math.max(maxValue, array.value(i));
     }
