@@ -46,7 +46,7 @@
     return [oldFirst];
   });
   listproto.add = function(index, newValue, options) {
-    if (index < 0 || index > this.length) { return this; }
+    if (index < 0 || index > this.size()) { return this; }
     if (index === 0) {
       return this.addFirst(newValue, options);
     }
@@ -122,7 +122,7 @@
     var opts = $.extend({hide: true}, options);
     if (index === 0) {
       return this.removeFirst(options);
-    } else if (index === this.length - 1) {
+    } else if (index === this.size() - 1) {
       return this.removeLast(options);
     }
     var prev = this.get(index - 1),
@@ -136,7 +136,7 @@
     return oldNode;
   };
   listproto.removeFirst = function(options) {
-    if (this.length <= 0) { return; }
+    if (this.size() <= 0) { return; }
     var opts = $.extend({hide: true}, options),
         oldFirst = this.first();
     this._setfirst(oldFirst.next(), options);
@@ -149,9 +149,9 @@
     return oldFirst;
   };
   listproto.removeLast = function(options) {
-    if (this.length <= 1) { return this.removeFirst(); }
+    if (this.size() <= 1) { return this.removeFirst(); }
     var opts = $.extend({hide: true}, options),
-        newLast = this.get(this.length - 2),
+        newLast = this.get(this.size() - 2),
         oldLast = this.last();
     newLast.next(null, options);
     if (opts.hide) {
@@ -425,7 +425,7 @@
       prevPos = curPos;
       curNode = curNode.next();
     }
-    if (list.length) {
+    if (list.size()) {
       width = maxLeft - minLeft;
       height = maxTop - minTop;
     } else {
