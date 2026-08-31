@@ -52,8 +52,8 @@
         toppie = this.element.css("top")==="auto"?dy:"+="+dy;
     this.element.css({left: leftie + "px", top: toppie + "px"});
     if (this.jsav._shouldAnimate()) {
-      this.element.css({x: -dx, y: -dy, z: 1});
-      this.jsav.effects.transition(this.element, {x: 0, y: 0, z: 1}, options);
+      this.element.css({transform: "translate3d(" + (-dx) + "px, " + (-dy) + "px, 0)"});
+      this.jsav.effects.transition(this.element, {transform: "translate3d(0,0,0)"}, options);
     }
     return [-dx, -dy, options];
   });
