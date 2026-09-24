@@ -18,7 +18,7 @@
       arg;
     for (var i = 0; i < arguments.length; i++) {
       arg = arguments[i];
-      if ($.isArray(arg)) {
+      if (Array.isArray(arg)) {
         for (var j = 0; j < arg.length; j++) {
           res[arg[j]] = this.css(arg[j]);
         }
@@ -156,7 +156,7 @@
     }
   };
   edgeproto.clear = function() {
-    this.g.rObj.remove();
+    d3.select(this.g.rObj).remove();
   };
   edgeproto.hide = function(options) {
     if (this.g.isVisible()) {
@@ -175,7 +175,7 @@
   };
   edgeproto.label = function(newLabel, options) {
     if (typeof newLabel === "undefined") {
-      if (this._label && this._label.element.filter(":visible").size() > 0) {
+      if (this._label && this._label.element.filter(":visible").length > 0) {
         return this._label.text();
       } else {
         return undefined;
@@ -253,12 +253,16 @@
     if (this.jsav._shouldAnimate()) { // only animate when playing, not when recording
       // el.animate(newprops, this.jsav.SPEED);
       for (i in newprops) {
-        d3.select(this.rObj).attr(i, newprops[i]);
+        d3.select(el).attr(i, newprops[i]);
       }
-      d3.select(this.rObj).transition().duration(this.jsav.SPEED);
+      d3.select(el).transition().duration(this.jsav.SPEED);
     } else {
       // el.attr(newprops);
-      d3.select(el).attr(newprops);
+      for (i in newprops) {
+        if (newprops.hasOwnProperty(i)) {
+          d3.select(el).attr(i, newprops[i]);
+        }
+      }
     }
     return [oldProps];
   });
@@ -287,7 +291,8 @@
         this.weight("");
       }
     } else {
-      var state = {a: this.g.rObj.attrs}, // get all attrs set for the element
+      //var state = {a: this.g.rObj.attrs}, // get all attrs set for the element
+      var state = {a: d3.select(this.g.rObj).attr()},
           cls = JSAV.utils._helpers.elementClasses(this.element); // get classes
       if (cls.length > 0) { state.cls = cls; }
       if (this.label()) { state.l = this.label(); } // label
@@ -297,7 +302,8 @@
     }
   };
   edgeproto.position = function() {
-    var bbox = d3.select(this.g).bounds();
+    //var bbox = d3.select(this.g).bounds();
+    var bbox = this.g.bounds();
     return {left: bbox.left, top: bbox.top};
   };
   // add class handling functions
@@ -370,7 +376,7 @@
 
     this.g.movePoints([[0].concat(fromPoint), [1].concat(toPoint)], options);
 
-    if ($.isFunction(this._labelPositionUpdate)) {
+    if (typeof this._labelPositionUpdate === "function") {
       var bbtop = Math.min(fromPoint[1], toPoint[1]),
           bbleft = Math.min(fromPoint[0], toPoint[0]),
           bbwidth = Math.abs(fromPoint[0] - toPoint[0]),
