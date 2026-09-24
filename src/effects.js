@@ -227,9 +227,11 @@
     transition: function($elems, cssProps, options) {
       this._animations += $elems.length;
       var that = this;
-      $elems.transition(cssProps, {duration: (options && options.duration) || this.SPEED,
-                                    delay: (options && options.delay) || 0,
-                                    complete: function() { that._animations--; }
+      
+      var duration = (options && options.duration) || this.SPEED;
+      var delay = (options && options.delay) || 0;
+      $elems.delay(delay).animate(cssProps, duration, function() {
+        that._animations--;
       });
     },
     /* toggles visibility of an element */
@@ -243,14 +245,14 @@
     },
     /* shows an element */
     show: function(options) {
-      if (this.element.filter(":visible").size() === 0) {
+      if (this.element.filter(":visible").length === 0) {
         this._toggleVisible(options);
       }
       return this;
     },
     /* hides an element */
     hide: function(options) {
-      if (this.element.filter(":visible").size() > 0) {
+      if (this.element.filter(":visible").length > 0) {
         this._toggleVisible(options);
       }
       return this;

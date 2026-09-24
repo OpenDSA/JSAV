@@ -169,7 +169,7 @@ if (typeof d3 !== "undefined") {
           }
           return this;
         } else {
-          var attrs = $.extend(true, {}, this.rObj.attrs);
+          var attrs = $.extend(true, {}, d3.select(this.rObj).attr());
           return attrs;
         }
       },
@@ -185,8 +185,8 @@ if (typeof d3 !== "undefined") {
       },
       id: JSAV._types.JSAVObject.prototype.id,
       clear: function () {
-        this.rObj.remove();
-        // d3.select(this.rObj).remove();
+        //this.rObj.remove();
+        d3.select(this.rObj).remove();
       },
     };
     var graphicalproto = JSAVGraphical.prototype;
@@ -214,19 +214,14 @@ if (typeof d3 !== "undefined") {
         // bind a jQuery event handler, limit to .jsavindex
         this.element.on(eventType, function (e) {
           // log the event
-          self.jsav.logEvent({
-            type: "jsav-graphical-" + eventType,
-            objid: self.id(),
-          });
-          if ($.isFunction(data)) {
-            // if no custom data..
+          self.jsav.logEvent({type: "jsav-graphical-" + eventType, objid: self.id()});
+          if (typeof data === "function") { // if no custom data..
             // ..bind this to the graphical primitive and call handler
             // with the event as param
             data.call(self, e);
-          } else if ($.isFunction(handler)) {
-            // if custom data is passed
+          } else if (typeof handler === "function") { // if custom data is passed
             // ..bind this to the graphical primitive and call handler
-            var params = $.isArray(data) ? data.slice(0) : [data]; // get a cloned data array or data as array
+            var params = Array.isArray(data)?data.slice(0):[data]; // get a cloned data array or data as array
             params.push(e); // jQuery event as the last
             handler.apply(self, params); // apply the function
           }
@@ -291,20 +286,16 @@ if (typeof d3 !== "undefined") {
       }
       for (var i = 0, l = currPath.length; i < l; i++) {
         pathElem = currPath[i];
+        if (i){
+          path_string += ",";
+        }
         if (i === point) {
-          newPath +=
-            pathElem[0] + " " + (+pathElem[1] + dx) + " " + (+pathElem[2] + dy);
-          path_string +=
-            pathElem[0] + " " + (+pathElem[1] + dx) + " " + (+pathElem[2] + dy);
-          if (pathElem[0] === "M") {
-            path_string += ",";
-          }
+          var movedElem = pathElem[0] + " " + (+pathElem[1] + dx) + " " + (+pathElem[2] + dy);
+          newPath += movedElem;
+          path_string += movedElem;
         } else {
           newPath += pathElem.join(" ");
           path_string += pathElem.join(" ");
-          if (pathElem[0] === "M") {
-            path_string += ",";
-          }
         }
       }
 
@@ -350,15 +341,11 @@ if (typeof d3 !== "undefined") {
       }
 
       var path_string = "";
-      var mid = newPath.length / 2;
-      for (i = 0; i < mid; i++) {
-        pathElem = newPath[i];
-        path_string += pathElem.join(" ");
-      }
-      path_string += ",";
-      for (i = mid; i < newPath.length; i++) {
-        pathElem = newPath[i];
-        path_string += pathElem.join(" ");
+      for (i = 0, l = newPath.length; i < l; i++) {
+        if (i){
+          path_string += ",";
+        }
+        path_string += newPath[i].join(" ");
       }
 
       this._setpoints(newPoints);
@@ -405,7 +392,7 @@ if (typeof d3 !== "undefined") {
           cx: d3.select(this.rObj).attr("cx"),
           cy: d3.select(this.rObj).attr("cy"),
         };
-      } else if ($.isArray(x) && x.length === 2) {
+      } else if (Array.isArray(x) && x.length === 2) {
         this._setattrs({ cx: x[0], cy: x[1] }, options);
       } else if (typeof y !== "undefined") {
         this._setattrs({ cx: x, cy: y }, options);
@@ -467,6 +454,15 @@ if (typeof d3 !== "undefined") {
     // var Line = function(jsav, raphael, x1, y1, x2, y2, props) {
     var Line = function Line(jsav, canvas, x1, y1, x2, y2, props) {
       // this.rObj = raphael.path("M" + x1 + " "+ y1 + "L" + x2 + " " + y2);
+      if (Array.isArray(x1)){
+        var coords = x1;
+        props = y1;
+        x1 = coords[0];
+        y1 = coords[1];
+        x2 = coords[2];
+        y2 = coords[3];
+      }
+      
       var path = "M" + x1 + " " + y1 + "L" + x2 + " " + y2;
       var path_string =
         "M" + " " + x1 + " " + y1 + "," + "L" + " " + x2 + " " + y2;
@@ -524,8 +520,8 @@ if (typeof d3 !== "undefined") {
 
     Line.prototype.translatePoint = translatePoint;
     Line.prototype._polylineMovePoints = movePoints;
-    Line.prototype.movePoints = function (newx1, newy1, newx2, newy2) {
-      if ($.isArray(newx1)) {
+    Line.prototype.movePoints = function(newx1, newy1, newx2, newy2) {
+      if (Array.isArray(newx1)) {
         // assume it's an array suitable for "general" movePoints
         return this._polylineMovePoints(newx1);
       } else {
@@ -567,7 +563,7 @@ if (typeof d3 !== "undefined") {
           rx: d3.select(this.rObj).attr("rx"),
           ry: d3.select(this.rObj).attr("ry"),
         };
-      } else if ($.isArray(x) && x.length === 2) {
+      } else if (Array.isArray(x) && x.length === 2) {
         this._setattrs({ rx: x[0], ry: x[1] }, options);
       } else if (typeof y !== "undefined") {
         this._setattrs({ rx: x, ry: y }, options);

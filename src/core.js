@@ -87,7 +87,7 @@
 
     this.container.addClass("jsavcontainer");
     this.canvas = this.container.find(".jsavcanvas");
-    if (this.canvas.size() === 0) {
+    if (this.canvas.length === 0) {
       this.canvas = $("<div />").addClass("jsavcanvas").appendTo(this.container);
       // this.canvas = d3.create("div").classed("jsavcanvas", true).append("div");
     }
@@ -108,7 +108,7 @@
   function initializations(jsav, options) {
     var fs = JSAV.init.functions;
     for (var i = 0; i < fs.length; i++) {
-      if ($.isFunction(fs[i])) {
+      if (typeof fs[i] === "function") {
         fs[i].call(jsav, options);
       }
     }
@@ -174,7 +174,9 @@
             }
 
             if (curr.tagName === "set") {
-              const children = d3.select(curr).selectChildren();
+              const children = d3.select(curr).selectAll(function(){
+                return this.children;
+              });
               children.each(function() {
                 bbox = this.getBBox();
             
