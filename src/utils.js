@@ -51,9 +51,9 @@
     var leftie = this.element.css("left")==="auto"?dx:"+="+dx,
         toppie = this.element.css("top")==="auto"?dy:"+="+dy;
     this.element.css({left: leftie + "px", top: toppie + "px"});
-    if (this.jsav._shouldAnimate()) {
-      this.element.css({transform: "translate3d(" + (-dx) + "px, " + (-dy) + "px, 0)"});
-      this.jsav.effects.transition(this.element, {transform: "translate3d(0,0,0)"}, options);
+    if (this.jsav._shouldAnimate() && (dx !== 0 || dy !== 0)) {
+      // slide the element from its old position (offset by -dx,-dy) to the new one
+      this.jsav.effects.translateFrom(this.element, -dx, -dy, options);
     }
     return [-dx, -dy, options];
   });
