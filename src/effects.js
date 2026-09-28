@@ -163,19 +163,19 @@
         $fromValElem.position({of: $toValElem});
         $toValElem.css(toPos);
         if (from.options.layout !== "bar") {
-          $fromValElem.transition({left: 0, top: 0}, this.SPEED, 'linear');
+          $fromValElem.animate({left: 0, top: 0}, this.SPEED, 'linear');
         } else {
           var bottom = $fromValElem.parent().height() - $fromValElem.position().top - fromValElemHeight;
           $fromValElem.css({top: "", bottom: bottom});
-          $fromValElem.transition({left: 0, bottom: 0}, this.SPEED, 'linear'); // animate to final position
+          $fromValElem.animate({left: 0, bottom: 0}, this.SPEED, 'linear'); // animate to final position
         }
       }
       if (to.options.layout !== "bar") {
-        $toValElem.transition({left: 0, top: 0}, this.SPEED, 'linear'); // animate to final position
+        $toValElem.animate({left: 0, top: 0}, this.SPEED, 'linear'); // animate to final position
       } else {
         var bottom = $toValElem.parent().height() - $toValElem.position().top - toValElemHeight;
         $toValElem.css({top: "", bottom: bottom});
-        $toValElem.transition({left: 0, bottom: 0}, this.SPEED, 'linear'); // animate to final position
+        $toValElem.animate({left: 0, bottom: 0}, this.SPEED, 'linear'); // animate to final position
       }
     }
 
@@ -209,6 +209,29 @@
       var delay = (options && options.delay) || 0;
       $elems.delay(delay).animate(cssProps, duration, function() {
         that._animations--;
+      });
+    },
+    /* Animate elements from a translate(fromX, fromY) offset back to their natural
+       position. Uses the Web Animations API because jQuery.animate() cannot
+       interpolate the CSS transform property. */
+    translateFrom: function($elems, fromX, fromY, options) {
+      var that = this,
+          duration = (options && options.duration) || this.SPEED,
+          delay = (options && options.delay) || 0;
+      this._animations += $elems.length;
+      $elems.each(function() {
+        var el = this;
+        var anim = el.animate(
+          [ { transform: "translate3d(" + fromX + "px, " + fromY + "px, 0)" },
+            { transform: "translate3d(0, 0, 0)" } ],
+          { duration: duration, delay: delay, easing: "linear" }
+        );
+        var done = function() {
+          el.style.transform = "";
+          that._animations--;
+        };
+        anim.onfinish = done;
+        anim.oncancel = done;
       });
     },
     /* toggles visibility of an element */
