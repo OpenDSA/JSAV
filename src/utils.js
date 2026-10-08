@@ -122,7 +122,7 @@
     if (name) { return; } // name was passed but param was not found, return undefined
     return vars;
   };
-  /* from raphaeljs */
+  /* from d3js */
   u.createUUID = function() {
     // http://www.ietf.org/rfc/rfc4122.txt
     var s = [],
@@ -974,7 +974,8 @@ mixkey(math.random(), pool);
         // position relative to the given array index, so set relElem to that index element
         relElem = relElem.index(options.relativeIndex).element; // get the array index object
       } else if (JSAV.utils.isGraphicalPrimitive(relElem)) { // JSAV graphical primitive
-        relElem = $(relElem.rObj.node);
+        //relElem = $(relElem.rObj.node);
+        relElem = $(relElem.rObj);
       } else {
         // if not jQuery object nor DOM element, assume JSAV object
         relElem = relElem.element || relElem;
