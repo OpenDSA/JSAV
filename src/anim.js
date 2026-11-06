@@ -36,7 +36,7 @@
           };
         }());
       }
-    } else {
+    } else if (typeof this.undoArgs === "undefined") {
       this.undoArgs = retVal;
     }
   };
