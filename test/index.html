@@ -7,11 +7,60 @@
     <link rel="stylesheet" href="../css/JSAV.css" media="screen" />
     <!-- Library Includes -->
     <script src="../lib/jquery.min.js"></script>
+    <script>
+      if (typeof jQuery.isFunction === "undefined") {
+        jQuery.isFunction = function(obj) { return typeof obj === "function"; };
+      }
+    </script>
     <script src="../lib/jquery-ui.min.js"></script>
-    <script src="../lib/jquery.transit.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <script src="utils/qunit.js"></script>
+    <script>
+      if (typeof QUnit !== "undefined") {
+        if (!QUnit.dump && QUnit.jsDump) {
+          QUnit.dump = QUnit.jsDump;
+        }
+        if (!QUnit.on) {
+          QUnit.on = function(evt, handler) {
+            if (evt === "testStart") {
+              QUnit.testStart(function(details) {
+                handler({
+                  name: details.name,
+                  moduleName: details.module,
+                  fullName: [details.module, details.name].filter(Boolean)
+                });
+              });
+            } else if (evt === "testEnd") {
+              QUnit.testDone(function(details) {
+                handler({
+                  name: details.name,
+                  moduleName: details.module,
+                  fullName: [details.module, details.name].filter(Boolean),
+                  status: details.failed ? "failed" : "passed",
+                  runtime: details.runtime,
+                  errors: []
+                });
+              });
+            } else if (evt === "runEnd") {
+              QUnit.done(function(details) {
+                handler({
+                  testCounts: {
+                    total: details.total,
+                    passed: details.passed,
+                    failed: details.failed,
+                    skipped: 0,
+                    todo: 0
+                  },
+                  runtime: details.runtime,
+                  status: details.failed ? "failed" : "passed"
+                });
+              });
+            }
+          };
+        }
+      }
+    </script>
     <script src="utils/qunit-assert-close.js"></script>
     <script src="utils/arrayutils.js"></script>
 
