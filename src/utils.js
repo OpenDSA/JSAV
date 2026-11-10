@@ -52,8 +52,13 @@
         toppie = this.element.css("top")==="auto"?dy:"+="+dy;
     this.element.css({left: leftie + "px", top: toppie + "px"});
     if (this.jsav._shouldAnimate()) {
-      this.element.css({transform: "translate3d(" + (-dx) + "px, " + (-dy) + "px, 0)"});
-      this.jsav.effects.transition(this.element, {transform: "translate3d(0,0,0)"}, options);
+      var jsav = this.jsav;
+      jsav._animations += this.element.length;
+      JSAV.utils._helpers.tweenOffset(this.element, [-dx, -dy], [0, 0], {
+        duration: (options && options.duration) || jsav.SPEED,
+        delay: (options && options.delay) || 0,
+        complete: function() { jsav._animations--; }
+      });
     }
     return [-dx, -dy, options];
   });
@@ -686,6 +691,30 @@ mixkey(math.random(), pool);
  
   var _helpers = {};
   u._helpers = _helpers;
+  // Sets a translate(x, y) offset on $elems and tweens it from `from` to `to` ([x, y] in px).
+  // Runs in each element's fx queue so delay, queue order and $.fx.off behave like .animate().
+  _helpers.tweenOffset = function($elems, from, to, options) {
+    var opts = $.extend({duration: 400, easing: "swing", delay: 0}, options),
+        translate = function(x, y) { return "translate(" + x + "px, " + y + "px)"; };
+    $elems.css("transform", translate(from[0], from[1]));
+    return $elems.delay(opts.delay).queue(function(next) {
+      var elem = this,
+          $elem = $(elem);
+      $({p: 0}).animate({p: 1}, {
+        duration: opts.duration,
+        easing: opts.easing,
+        step: function(p) {
+          $elem.css("transform", translate(from[0] + (to[0] - from[0]) * p,
+                                           from[1] + (to[1] - from[1]) * p));
+        },
+        complete: function() {
+          $elem.css("transform", translate(to[0], to[1]));
+          if (typeof opts.complete === "function") { opts.complete.call(elem); }
+          next();
+        }
+      });
+    });
+  };
   var JSAV_CLASS_NAMES = ["jsavarray", "jsavhorizontalarray", "jsavverticalarray",
                           "jsavbararray", "jsavindexed",
                           "jsavnode", "jsavindex",

@@ -26,8 +26,6 @@
       var opt = $.extend({queue: true, easing: "linear", delay: 0}, opts);
       opt.duration = jQuery.fx.off ? 0 : typeof opt.duration === "number" ? opt.duration :
           opt.duration in jQuery.fx.speeds ? jQuery.fx.speeds[ opt.duration ] : jQuery.fx.speeds._default;
-      // Account for aliases (`in` => `ease-in`).
-      if ($.cssEase[opt.easing]) { opt.easing = $.cssEase[opt.easing]; }
 
       // Build the duration/easing/delay attributes for the transition.
       var transitionValue = 'all ' + opt.duration + 'ms ' + opt.easing;
@@ -35,7 +33,7 @@
 
       // If there's nothing to do...
       if (opt.duration === 0) {
-        return this.toggleClass( this, arguments );
+        return this.toggleClass( classNames );
       }
 
       var RUN_DONE = false; // keep track if the toggle has already been done
@@ -47,30 +45,30 @@
         var cb = function() {
           if (called) { return; }
           called = true;
-          if (bound) { self.off($.support.transitionEnd, cb); }
+          if (bound) { self.off("transitionend", cb); }
 
           self.each(function() {
             // clear the transition properties of all elements
-            this.style[$.support.transition] = null;
+            this.style.transition = "";
           });
           if (typeof opt.complete === 'function') { opt.complete.apply(self); }
           if (typeof nextCall === 'function') { nextCall(); }
         };
 
-        if ((opt.duration > 0) && ($.support.transitionEnd) && ($.transit.useTransitionEnd)) {
+        if (opt.duration > 0) {
           // Use the 'transitionend' event if it's available.
           bound = true;
-          self.on($.support.transitionEnd, cb);
+          self.on("transitionend", cb);
         }
 
-        // Fallback to timers if the 'transitionend' event isn't supported or fails to trigger.
-        window.setTimeout(cb, opt.duration);
+        // Fallback to timers if the 'transitionend' event fails to trigger
+        window.setTimeout(cb, opt.duration + (opt.delay || 0) + 50);
 
         if (!RUN_DONE) { // Apply only once
           // Apply transitions
           self.each(function() {
             if (opt.duration > 0) {
-              this.style[$.support.transition] = transitionValue;
+              this.style.transition = transitionValue;
             }
             $(this).toggleClass(classNames);
           });
@@ -163,19 +161,19 @@
         $fromValElem.position({of: $toValElem});
         $toValElem.css(toPos);
         if (from.options.layout !== "bar") {
-          $fromValElem.transition({left: 0, top: 0}, this.SPEED, 'linear');
+          $fromValElem.animate({left: 0, top: 0}, this.SPEED, 'linear');
         } else {
           var bottom = $fromValElem.parent().height() - $fromValElem.position().top - fromValElemHeight;
           $fromValElem.css({top: "", bottom: bottom});
-          $fromValElem.transition({left: 0, bottom: 0}, this.SPEED, 'linear'); // animate to final position
+          $fromValElem.animate({left: 0, bottom: 0}, this.SPEED, 'linear'); // animate to final position
         }
       }
       if (to.options.layout !== "bar") {
-        $toValElem.transition({left: 0, top: 0}, this.SPEED, 'linear'); // animate to final position
+        $toValElem.animate({left: 0, top: 0}, this.SPEED, 'linear'); // animate to final position
       } else {
         var bottom = $toValElem.parent().height() - $toValElem.position().top - toValElemHeight;
         $toValElem.css({top: "", bottom: bottom});
-        $toValElem.transition({left: 0, bottom: 0}, this.SPEED, 'linear'); // animate to final position
+        $toValElem.animate({left: 0, bottom: 0}, this.SPEED, 'linear'); // animate to final position
       }
     }
 
@@ -346,10 +344,6 @@
           .attr("marker-end", "url(#" + upwardstr + ")");
  
         }
-        // .. then set the position so that the array appears unchanged..
-        $val2.css({"x": -posdiffX, "y": -posdiffY, z: 1});
-        $val1.css({"x": posdiffX, "y": posdiffY, z: 1});
-
         // mark to JSAV that we're animating something more complex
         this._animations += 1;
         var jsav = this;
@@ -357,9 +351,11 @@
         if (opts.highlight) {
           $both.addClass("jsavswap", 3*speed);
         }
-        // ..animate the translation to 0, so they'll be in their final positions..
-        $val1.transition({"x": 0, y: 0, z: 0}, 7*speed, 'linear');
-        $val2.transition({x: 0, y: 0, z: 0}, 7*speed, 'linear',
+        // ..offset the values so the array appears unchanged, then animate the offset to 0..
+        JSAV.utils._helpers.tweenOffset($val1, [posdiffX, posdiffY], [0, 0],
+                                        {duration: 7*speed, easing: "linear"});
+        JSAV.utils._helpers.tweenOffset($val2, [-posdiffX, -posdiffY], [0, 0],
+                                        {duration: 7*speed, easing: "linear", complete:
           function() {
             if (arr) { arr.remove(); } // ..remove the arrows if they exist
             // ..and finally animate to the original styles.
@@ -368,7 +364,7 @@
             }
             // notify jsav that we're done with our animation
             jsav._animations -= 1;
-        });
+        }});
       }
     }
   };

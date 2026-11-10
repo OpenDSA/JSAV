@@ -350,6 +350,6 @@
     // bind the jsav-question-reset event of the container to reset the questions
     this.container.on({"jsav-question-reset": function() {
         this.resetQuestionAnswers();
-      }.bind(this)});
+      }.bind(this)}); //javascript plain function so .bind not .on
     });
 }(jQuery));
