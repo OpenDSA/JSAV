@@ -56,6 +56,11 @@ module.exports = function(grunt) {
       }
     },
     qunit: {
+      options: {
+        puppeteer: {
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
+        }
+      },
       files: ['test/index.html']
     },
     jshint: { // for linting the JS
