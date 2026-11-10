@@ -103,4 +103,39 @@
     equal(av.currentStep(), 2);
 
   });
+
+  test("backward stepping preserves undoArgs and restores styles after swap", function() {
+    var av = new JSAV("emptycontainer"),
+        arr = av.ds.array([10, 20, 30, 40]);
+    av.displayInit();
+    arr.swap(0, 1);
+    arr.css(0, {"background-color": "blue", "color": "white"});
+    av.step();
+    arr.swap(1, 2);
+    av.step();
+    av.recorded();
+
+    equal(av.totalSteps(), 2);
+    equal(av.currentStep(), 0);
+
+    var initBg = arr.element.find("li:eq(0)").css("background-color");
+
+    jQuery.fx.off = true; // turn off smooth animation for unit test
+    // Move forward
+    av.forward();
+    av.forward();
+    equal(av.currentStep(), 2);
+
+    // Move backward
+    av.backward();
+    av.backward();
+    equal(av.currentStep(), 0);
+
+    // Style at step 0 should match initial style, without any lingering swap styles
+    var backBg = arr.element.find("li:eq(0)").css("background-color");
+    equal(backBg, initBg, "Testing background-color restored without lingering swap colors");
+    ok(!arr.element.find("li:eq(0)").hasClass("jsavswap"), "Node 0 does not have jsavswap class");
+    ok(!arr.element.find("li:eq(1)").hasClass("jsavswap"), "Node 1 does not have jsavswap class");
+    jQuery.fx.off = false;
+  });
 })();
