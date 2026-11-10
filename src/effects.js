@@ -33,7 +33,7 @@
 
       // If there's nothing to do...
       if (opt.duration === 0) {
-        return this.toggleClass( this, arguments );
+        return this.toggleClass( classNames );
       }
 
       var RUN_DONE = false; // keep track if the toggle has already been done
@@ -61,8 +61,8 @@
           self.on("transitionend", cb);
         }
 
-        // Fallback to timers if the 'transitionend' event isn't supported or fails to trigger.
-        window.setTimeout(cb, opt.duration);
+        // Fallback to timers if the 'transitionend' event fails to trigger
+        window.setTimeout(cb, opt.duration + (opt.delay || 0) + 50);
 
         if (!RUN_DONE) { // Apply only once
           // Apply transitions
